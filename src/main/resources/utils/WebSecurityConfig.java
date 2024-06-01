@@ -1,6 +1,5 @@
 package app.dietdash.config;
 
-import app.dietdash.service.AppUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

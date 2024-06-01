@@ -1,6 +1,5 @@
 package app.dietdash.controller;
 
-import app.dietdash.service.AppUserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 

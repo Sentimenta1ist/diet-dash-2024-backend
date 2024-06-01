@@ -4,7 +4,6 @@ package app.dietdash.controller;
 import app.dietdash.service.MealService;
 import app.dietdash.service.ProductService;
 import app.dietdash.service.ProfileService;
-import app.dietdash.service.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

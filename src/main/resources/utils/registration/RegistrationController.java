@@ -1,4 +1,4 @@
-package app.dietdash.registration;
+package utils.registration;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestBody;

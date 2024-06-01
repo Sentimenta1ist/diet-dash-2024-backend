@@ -1,0 +1,16 @@
+package app.dietdash.repository;
+
+import app.dietdash.model.Meal;
+import app.dietdash.model.Ration;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+@Repository
+public interface RationRepository extends JpaRepository<Ration, UUID> {
+
+
+}

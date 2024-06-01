@@ -1,6 +1,5 @@
 package app.dietdash.service;
 
-import app.dietdash.repository.AppUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

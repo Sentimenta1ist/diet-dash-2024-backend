@@ -1,4 +1,4 @@
-package app.dietdash.registration;
+package utils.registration;
 
 public class RegistrationService {
 

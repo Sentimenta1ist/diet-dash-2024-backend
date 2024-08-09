@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -26,10 +25,10 @@ public class RationController {
     private final RationService rationService;
 
     @GetMapping("/{profileId}")
-    public ResponseEntity<List<Ration>> getAllMeals(
+    public ResponseEntity<Ration> getRation(
             @PathVariable UUID profileId,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(rationService.getAllRations());
+        return ResponseEntity.ok(rationService.getRationByProfileAndDate(profileId, date));
     }
 
     @PostMapping("/add/{profileId}")

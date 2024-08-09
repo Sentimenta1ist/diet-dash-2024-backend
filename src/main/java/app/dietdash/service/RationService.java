@@ -64,8 +64,10 @@ public class RationService {
         return "Saved.";
     }
 
-    public List<Ration> getAllRations(){
-        return rationRepository.findAll();
+    public Ration getRationByProfileAndDate(final UUID profileId, final LocalDate date) {
+        return profileRepository.findById(profileId)
+                .flatMap(value -> rationRepository.findByProfileAndDate(value, date))
+                .orElse(null);
     }
 
     public void addMeal(MealDto mealDto) {

@@ -22,6 +22,7 @@ services:
 
   diet_dash:
     image: diet-dash-image
+    container_name: diet-dash-backend
     environment:
       - SPRING_PROFILES_ACTIVE=local
     ports:

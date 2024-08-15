@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,9 +31,8 @@ public class ProfileController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<UUID> addProfile(@RequestBody Profile profile) {
-        Profile added = profileService.createProfile(profile);
-        return new ResponseEntity<>(added.getId(), HttpStatus.OK);
+    public ResponseEntity<UUID> addProfile(@RequestBody Profile profile, Principal principal) {
+        return ResponseEntity.ok(profileService.addProfile(profile, principal));
     }
 
     @PutMapping("/update")

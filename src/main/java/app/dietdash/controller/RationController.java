@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -46,6 +47,11 @@ public class RationController {
         rationService.addMeal(meal);
 
         return ResponseEntity.ok("fuckf");
+    }
+
+    @GetMapping("/current-user")
+    public String getCurrentUser(Principal principal) {
+        return "Current user: " + principal.getName();
     }
 
 }

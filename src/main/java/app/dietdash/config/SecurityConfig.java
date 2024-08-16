@@ -28,9 +28,9 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers(HttpMethod.POST, "/login", "/register").permitAll()
-                        .anyRequest().authenticated()
-//                                .anyRequest().permitAll()
+//                        .requestMatchers(HttpMethod.POST, "/login", "/register").permitAll()
+//                        .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 );
         return http.build();
     }

@@ -1,5 +1,6 @@
 package app.dietdash.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,6 +14,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -43,6 +45,11 @@ public class User {
     @Size(max = 100)
     private String password;
 
-    @OneToMany
-    private List<Profile> profileList;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Profile> profileList = new ArrayList<>();
+
+    public void addProfile(final Profile profile) {
+        profileList.add(profile);
+        profile.setUser(this);
+    }
 }

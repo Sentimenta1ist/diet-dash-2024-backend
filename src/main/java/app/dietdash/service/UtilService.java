@@ -1,27 +1,23 @@
 package app.dietdash.service;
 
+import app.dietdash.dto.UserDto;
+import app.dietdash.model.User;
+import app.dietdash.repository.UserRepository;
 import exceptions.AppException;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
-
 @Service
+@AllArgsConstructor
 public class UtilService {
 
-    public String getLoginFromPrincipal(final Principal principal) {
-        if (principal == null || principal.getName() == null || principal.getName().isEmpty()) {
-            throw new AppException("Empty user", HttpStatus.BAD_REQUEST);
-        }
+    private final UserRepository userRepository;
 
-        // Use regex to extract the login part
-        final String login = principal.getName().replaceAll(".*login=(.*?),.*", "$1");
+    public User getUserFromPrincipal(final UserDto principal) {
+        final String login = principal == null ? null : principal.getLogin();
 
-        if (login.isEmpty()) {
-            throw new AppException("User without login", HttpStatus.BAD_REQUEST);
-        }
-
-        return login;
+        return userRepository.findByLogin(login)
+                .orElseThrow(() -> new AppException("Unknown user with login: " + login, HttpStatus.NOT_FOUND));
     }
-
 }

@@ -33,6 +33,11 @@ public class ProfileController {
         return ResponseEntity.ok(profileService.getAllProfiles(term, principal));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Profile> getProfileById(@PathVariable UUID id) {
+        return ResponseEntity.ok(profileService.getProfileById(id));
+    }
+
     @PostMapping
     public ResponseEntity<UUID> addProfile(@RequestBody Profile profile, @AuthenticationPrincipal UserDto principal) {
         return ResponseEntity.ok(profileService.addProfile(profile, principal));

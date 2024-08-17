@@ -30,6 +30,10 @@ public class ProfileService {
                 .toList();
     }
 
+    public Profile getProfileById(final UUID id) {
+        return profileRepository.findById(id).orElseThrow(() -> new AppException("Unknown profile with id: " + id, HttpStatus.NOT_FOUND));
+    }
+
     @Transactional
     public UUID addProfile(final Profile profile, final UserDto principal) {
         final User user = utilService.getUserFromPrincipal(principal);

@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 
 @Getter
@@ -18,11 +19,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "product")
+@ToString
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @JsonIgnore
     private Integer id;
 
     private String name;
@@ -30,16 +31,4 @@ public class Product {
     private float proteins;
     private float fats;
     private float carbs;
-
-    @Override
-    public String toString() {
-        return "Product{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", calories=" + calories +
-                ", proteins=" + proteins +
-                ", fats=" + fats +
-                ", carbs=" + carbs +
-                '}';
-    }
 }

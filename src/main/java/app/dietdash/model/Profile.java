@@ -36,10 +36,14 @@ public class Profile {
     private int bedra;
     private int weightAim;
     private String aim;
-    private int limitCal;
-    private int carbs;
-    private int proteins;
-    private int fats;
+    private int selectedLimitCal;
+    private int selectedCarbs;
+    private int selectedProteins;
+    private int selectedFats;
+    private int recomendedLimitCal;
+    private int recomendedCarbs;
+    private int recomendedProteins;
+    private int recomendedFats;
     private int activity;
 
     @OneToMany(mappedBy = "profile")
@@ -51,27 +55,5 @@ public class Profile {
 
     public Profile() {
         rations = Collections.emptyList();
-    }
-
-    @Override
-    public String toString() {
-        return "Profile{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", age=" + age +
-                ", sex='" + sex + '\'' +
-                ", height=" + height +
-                ", weight=" + weight +
-                ", talia=" + talia +
-                ", bedra=" + bedra +
-                ", weightAim=" + weightAim +
-                ", aim='" + aim + '\'' +
-                ", limitCal=" + limitCal +
-                ", carbs=" + carbs +
-                ", proteins=" + proteins +
-                ", fats=" + fats +
-                ", activity=" + activity +
-                ", rations=" + rations +
-                '}';
     }
 }

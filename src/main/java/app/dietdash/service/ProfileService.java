@@ -22,11 +22,10 @@ public class ProfileService {
     private final UtilService utilService;
     private final UserMapper mapper;
 
-    public List<ProfileDto> getAllProfiles(final UserDto principal) {
-        final User user = utilService.getUserFromPrincipal(principal);
-
-        return user.getProfileList()
+    public List<ProfileDto> getAllProfiles(final String term, final UserDto principal) {
+        return utilService.getUserFromPrincipal(principal).getProfileList()
                 .stream()
+                .filter(x -> term == null || x.getName().toLowerCase().contains(term.toLowerCase()))
                 .map(mapper::toProfileDto)
                 .toList();
     }
@@ -55,13 +54,5 @@ public class ProfileService {
                 .orElseThrow(() -> new AppException("Unknown profile with id: " + id, HttpStatus.NOT_FOUND));
 
         profileRepository.deleteById(id);
-    }
-
-    public List<ProfileDto> getProfilesByName(final String term, final UserDto principal) {
-        return utilService.getUserFromPrincipal(principal).getProfileList()
-                .stream()
-                .filter(x -> x.getName().toLowerCase().contains(term.toLowerCase()))
-                .map(mapper::toProfileDto)
-                .toList();
     }
 }

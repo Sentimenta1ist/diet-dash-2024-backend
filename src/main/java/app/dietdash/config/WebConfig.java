@@ -23,13 +23,15 @@ public class WebConfig {
     public FilterRegistrationBean corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:3000");
+        //config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
         config.setAllowedHeaders(Arrays.asList(
+                "ngrok-skip-browser-warning",
                 HttpHeaders.AUTHORIZATION,
                 HttpHeaders.CONTENT_TYPE,
                 HttpHeaders.ACCEPT));
         config.setAllowedMethods(Arrays.asList(
+                HttpMethod.OPTIONS.name(),
                 HttpMethod.GET.name(),
                 HttpMethod.POST.name(),
                 HttpMethod.PUT.name(),

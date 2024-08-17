@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -26,12 +27,10 @@ public class ProfileController {
 
     private final ProfileService profileService;
 
-    @GetMapping("/{term}")
-    public ResponseEntity<List<ProfileDto>> getAllProfiles(@PathVariable String term, @AuthenticationPrincipal UserDto principal) {
-        if (term.equals(" ")) {
-            return ResponseEntity.ok(profileService.getAllProfiles(principal));
-        }
-        return ResponseEntity.ok(profileService.getProfilesByName(term, principal));
+    @GetMapping("")
+    public ResponseEntity<List<ProfileDto>> getAllProfiles(@RequestParam(required = false) String term,
+                                                           @AuthenticationPrincipal UserDto principal) {
+        return ResponseEntity.ok(profileService.getAllProfiles(term, principal));
     }
 
     @PostMapping

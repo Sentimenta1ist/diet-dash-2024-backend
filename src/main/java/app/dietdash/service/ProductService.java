@@ -2,33 +2,30 @@ package app.dietdash.service;
 
 import app.dietdash.model.Product;
 import app.dietdash.repository.ProductRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 @Service
+@AllArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
 
-    public ProductService(ProductRepository productRepository) {
-        this.productRepository = productRepository;
+    public Page<Product> getProductsPage(final String term, final Pageable pageable) {
+        if (term == null) {
+            return productRepository.findAll(pageable);
+        } else {
+            return productRepository.findByNameContainingIgnoreCase(term, pageable);
+        }
+
     }
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
-    }
-
-    public List<Product> getProductsByName(String name) {
-        System.out.println(productRepository.findByNameContainingIgnoreCase(name));
-        return productRepository.findByNameContainingIgnoreCase(name);
-    }
-
-    public Product createProduct(Product product) {
+    @Transactional
+    public void createProduct(Product product) {
         product.setName(product.getName().toLowerCase());
-        return productRepository.save(product);
+        productRepository.save(product);
     }
 
     @Transactional

@@ -43,15 +43,7 @@ public class RationController {
 
     @PostMapping("/add")
     public ResponseEntity<String> addMeal(@RequestBody MealDto meal) {
-
         rationService.addMeal(meal);
-
-        return ResponseEntity.ok("fuckf");
+        return ResponseEntity.ok("Added");
     }
-
-    @GetMapping("/current-user")
-    public String getCurrentUser(Principal principal) {
-        return "Current user: " + principal.getName();
-    }
-
 }

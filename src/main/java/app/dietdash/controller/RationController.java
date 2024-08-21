@@ -5,6 +5,8 @@ import app.dietdash.model.Ration;
 import app.dietdash.service.RationService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -46,4 +47,17 @@ public class RationController {
         rationService.addMeal(meal);
         return ResponseEntity.ok("Added");
     }
+
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportRation(
+            @RequestParam("profileId") UUID profileId,
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+        // Create HTTP response with Excel content
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=rations.xlsx");
+        headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        return new ResponseEntity<>(rationService.exportXlsx(start, end, profileId), headers, HttpStatus.OK);
+    }
+
 }

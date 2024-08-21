@@ -26,6 +26,8 @@ public class WebConfig {
         //config.setAllowCredentials(true);
         config.addAllowedOrigin("*");
         config.setAllowedHeaders(Arrays.asList(
+                HttpHeaders.CONTENT_DISPOSITION,
+                HttpHeaders.CONTENT_TYPE,
                 "ngrok-skip-browser-warning",
                 HttpHeaders.AUTHORIZATION,
                 HttpHeaders.CONTENT_TYPE,

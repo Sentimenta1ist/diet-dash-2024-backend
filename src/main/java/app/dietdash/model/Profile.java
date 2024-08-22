@@ -1,5 +1,7 @@
 package app.dietdash.model;
 
+import app.dietdash.enums.Activity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Collections;
@@ -19,41 +22,38 @@ import java.util.UUID;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "profile")
 public class Profile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonIgnore
     private UUID id;
 
     private String name;
     private int age;
-    private String sex;
+    private String gender;
     private int height;
     private int weight;
-    private int talia;
-    private int bedra;
-    private int weightAim;
-    private String aim;
-    private int selectedLimitCal;
-    private int selectedCarbs;
-    private int selectedProteins;
-    private int selectedFats;
-    private int recomendedLimitCal;
-    private int recomendedCarbs;
-    private int recomendedProteins;
-    private int recomendedFats;
-    private int activity;
+    private int waist;
+    private int hips;
+    private int goalWeight;
+    private Activity activity = Activity.NO_ACTIVITY;
+    private double bodyMassIndex;
+    private int dailyCalorieNorm;
+    private int selectedCalorieLimit;
+    private float dailyProteinLimit;
+    private float dailyFatLimit;
+    private float dailyCarbsLimit;
 
     @OneToMany(mappedBy = "profile")
-    private List<Ration> rations;
+    @JsonIgnore
+    private List<Ration> rations = Collections.emptyList();
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
-
-    public Profile() {
-        rations = Collections.emptyList();
-    }
 }

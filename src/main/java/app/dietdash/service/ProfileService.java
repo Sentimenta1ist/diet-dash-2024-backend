@@ -1,7 +1,9 @@
 package app.dietdash.service;
 
-import app.dietdash.dto.ProfileDto;
+import app.dietdash.dto.ActivityDto;
+import app.dietdash.dto.ProfileNameDto;
 import app.dietdash.dto.UserDto;
+import app.dietdash.enums.Activity;
 import app.dietdash.model.Profile;
 import app.dietdash.model.User;
 import app.dietdash.repository.ProfileRepository;
@@ -12,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +25,11 @@ public class ProfileService {
     private final UtilService utilService;
     private final UserMapper mapper;
 
-    public List<ProfileDto> getAllProfiles(final String term, final UserDto principal) {
+    public List<ActivityDto> getAllActivities() {
+        return Arrays.stream(Activity.values()).map(mapper::toActivityDto).toList();
+    }
+
+    public List<ProfileNameDto> getAllProfiles(final String term, final UserDto principal) {
         return utilService.getUserFromPrincipal(principal).getProfileList()
                 .stream()
                 .filter(x -> term == null || x.getName().toLowerCase().contains(term.toLowerCase()))
@@ -46,9 +53,10 @@ public class ProfileService {
 
     @Transactional
     public void updateProfile(final UUID id, final Profile profile) {
-        profileRepository.findById(id)
+        Profile oldProfile = profileRepository.findById(id)
                 .orElseThrow(() -> new AppException("Unknown profile with id: " + profile.getId(), HttpStatus.NOT_FOUND));
-        profile.setId(id);
+        profile.setId(oldProfile.getId());
+        profile.setUser(oldProfile.getUser());
         profileRepository.save(profile);
     }
 

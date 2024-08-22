@@ -1,6 +1,7 @@
 package app.dietdash.controller;
 
-import app.dietdash.dto.ProfileDto;
+import app.dietdash.dto.ActivityDto;
+import app.dietdash.dto.ProfileNameDto;
 import app.dietdash.dto.UserDto;
 import app.dietdash.model.Profile;
 import app.dietdash.service.ProfileService;
@@ -28,8 +29,8 @@ public class ProfileController {
     private final ProfileService profileService;
 
     @GetMapping("")
-    public ResponseEntity<List<ProfileDto>> getAllProfiles(@RequestParam(required = false) String term,
-                                                           @AuthenticationPrincipal UserDto principal) {
+    public ResponseEntity<List<ProfileNameDto>> getAllProfiles(@RequestParam(required = false) String term,
+                                                               @AuthenticationPrincipal UserDto principal) {
         return ResponseEntity.ok(profileService.getAllProfiles(term, principal));
     }
 
@@ -53,6 +54,11 @@ public class ProfileController {
     public ResponseEntity<String> deleteProfile(@PathVariable UUID id) {
         profileService.deleteProfile(id);
         return ResponseEntity.ok("Deleted");
+    }
+
+    @GetMapping("/activities")
+    public ResponseEntity<List<ActivityDto>> getActivities() {
+        return ResponseEntity.ok(profileService.getAllActivities());
     }
 }
 

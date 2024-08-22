@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalTime;
 
@@ -23,6 +24,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Builder
 @Entity
+@ToString
 @Table(name = "meal")
 public class Meal {
     @Id
@@ -38,14 +40,4 @@ public class Meal {
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     Product product;
-
-    @Override
-    public String toString() {
-        return "Meal{" +
-                "id=" + id +
-                ", time=" + time +
-                ", amount=" + amount +
-                ", product=" + product +
-                '}';
-    }
 }

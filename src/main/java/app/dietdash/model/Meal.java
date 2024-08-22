@@ -33,7 +33,7 @@ public class Meal {
     @JsonFormat(pattern = "HH:mm")
     LocalTime time;
 
-    float amount;
+    int amount;
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")

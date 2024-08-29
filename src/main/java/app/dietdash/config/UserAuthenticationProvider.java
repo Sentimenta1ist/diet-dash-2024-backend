@@ -6,9 +6,11 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import exceptions.AppException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -54,7 +56,10 @@ public class UserAuthenticationProvider {
 
         UserDto user = userService.findByLogin(decoded.getSubject());
 
-        return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+        if(user.isEnabled()) {
+            return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+        } else {
+            throw new AppException("Email is not activated", HttpStatus.NOT_ACCEPTABLE);
+        }
     }
-
 }

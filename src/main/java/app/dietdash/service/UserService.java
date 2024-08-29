@@ -7,13 +7,18 @@ import app.dietdash.model.User;
 import app.dietdash.repository.UserRepository;
 import app.dietdash.service.mapper.UserMapper;
 import exceptions.AppException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.CharBuffer;
 import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -21,39 +26,90 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final EmailService emailService;
+
     private final PasswordEncoder passwordEncoder;
 
     private final UserMapper userMapper;
 
-    public UserDto login(CredentialsDto credentialsDto) {
-        User user = userRepository.findByLogin(credentialsDto.getLogin())
-                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+    public UserDto login(final CredentialsDto credentialsDto) {
+        final User user = findUser(credentialsDto.getLogin());
+
+        if (!user.isEnabled()) {
+            throw new AppException("Email " + user.getLogin() + " not activated.", HttpStatus.NOT_ACCEPTABLE);
+        }
 
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), user.getPassword())) {
             return userMapper.toUserDto(user);
         }
+
         throw new AppException("Invalid password", HttpStatus.BAD_REQUEST);
     }
 
-    public UserDto register(SignUpDto userDto) {
+    public UserDto register(final SignUpDto userDto) {
         Optional<User> optionalUser = userRepository.findByLogin(userDto.getLogin());
 
         if (optionalUser.isPresent()) {
             throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
         }
 
-        User user = userMapper.signUpToUser(userDto);
+        final User user = userMapper.signUpToUser(userDto);
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
+        user.setConfirmationToken(UUID.randomUUID());
 
-        User savedUser = userRepository.save(user);
+        final User savedUser = userRepository.save(user);
+
+        sendEmail(user);
 
         return userMapper.toUserDto(savedUser);
     }
 
     public UserDto findByLogin(String login) {
-        User user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+        final User user = findUser(login);
         return userMapper.toUserDto(user);
     }
 
+    @Transactional
+    public void confirmUser(final UUID confirmationToken) {
+        User user = userRepository.findByConfirmationToken(confirmationToken)
+                .orElseThrow(() -> new AppException("Unknown user with this confirmation token", HttpStatus.NOT_FOUND));
+        user.setEnabled(true);
+        userRepository.save(user);
+    }
+
+    private void sendEmail(final User user) {
+        final MimeMessage mimeMessage = emailService.createMimeMessage();
+        try {
+            final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+            helper.setTo(user.getLogin());
+            helper.setSubject("Verify your registration, please.");
+            final String content = createEmailContent(user.getFirstName(), user.getConfirmationToken());
+            helper.setText(content, true);
+        } catch (MessagingException ex) {
+            throw new AppException("Cannot send email", HttpStatus.BAD_REQUEST);
+        }
+        emailService.send(mimeMessage);
+    }
+
+    private User findUser(final String login) {
+        return userRepository.findByLogin(login)
+                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+    }
+
+    private String createEmailContent(final String name, final UUID confirmationToken) {
+        return "<html>"
+                + "<body style='font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;'>"
+                + "<div style='max-width: 600px; margin: 20px auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);'>"
+                + "<h2 style='color: #333333; text-align: center;'>Verify Your Registration</h2>"
+                + "<p style='font-size: 16px; color: #666666;'>Dear " + name + ",</p>"
+                + "<p style='font-size: 16px; color: #666666;'>Please click the link below to verify your registration:</p>"
+                + "<div style='text-align: center; margin: 20px;'>"
+                + "<a href='https://diet-dash.com/login?token=" + confirmationToken
+                + "' style='font-size: 18px; color: #ffffff; background-color: #4CAF50; text-decoration: none; padding: 10px 20px; border-radius: 5px; display: inline-block;'>VERIFY</a>"
+                + "</div>"
+                + "<p style='font-size: 14px; color: #666666;'>Thank you,<br>The Diet Dash Team</p>"
+                + "</div>"
+                + "</body>"
+                + "</html>";
+    }
 }

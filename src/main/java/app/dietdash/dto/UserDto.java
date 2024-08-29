@@ -16,5 +16,5 @@ public class UserDto {
     private String lastName;
     private String login;
     private String token;
-
+    private boolean enabled;
 }

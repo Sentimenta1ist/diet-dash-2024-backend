@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -44,6 +45,12 @@ public class User {
     @Column(nullable = false)
     @Size(max = 100)
     private String password;
+
+    @Column(name = "confirmation_token", nullable = false)
+    private UUID confirmationToken;
+
+    @Column(nullable = false)
+    private boolean enabled;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Profile> profileList = new ArrayList<>();

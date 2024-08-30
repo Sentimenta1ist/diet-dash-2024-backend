@@ -20,27 +20,16 @@ public class WebConfig {
     private static final int CORS_FILTER_ORDER = -102;
 
     @Bean
-    public FilterRegistrationBean corsFilter() {
+    public FilterRegistrationBean<CorsFilter> corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         //config.setAllowCredentials(true);
         config.addAllowedOrigin("*");
-        config.setAllowedHeaders(Arrays.asList(
-                HttpHeaders.CONTENT_DISPOSITION,
-                HttpHeaders.CONTENT_TYPE,
-                "ngrok-skip-browser-warning",
-                HttpHeaders.AUTHORIZATION,
-                HttpHeaders.CONTENT_TYPE,
-                HttpHeaders.ACCEPT));
-        config.setAllowedMethods(Arrays.asList(
-                HttpMethod.OPTIONS.name(),
-                HttpMethod.GET.name(),
-                HttpMethod.POST.name(),
-                HttpMethod.PUT.name(),
-                HttpMethod.DELETE.name()));
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
         config.setMaxAge(MAX_AGE);
         source.registerCorsConfiguration("/**", config);
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
+        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
 
         // should be set order to -100 because we need to CorsFilter before SpringSecurityFilter
         bean.setOrder(CORS_FILTER_ORDER);

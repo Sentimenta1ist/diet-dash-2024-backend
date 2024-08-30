@@ -4,7 +4,6 @@ import app.dietdash.config.UserAuthenticationProvider;
 import app.dietdash.dto.CredentialsDto;
 import app.dietdash.dto.SignUpDto;
 import app.dietdash.dto.UserDto;
-import app.dietdash.service.EmailService;
 import app.dietdash.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +38,18 @@ public class AuthController {
         UserDto createdUser = userService.register(user);
         createdUser.setToken(userAuthenticationProvider.createToken(user.getLogin()));
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId())).body(createdUser);
+    }
+
+    @PostMapping("/send-forgot-email")
+    public ResponseEntity<?> sendEmail(@RequestParam String email) {
+        userService.sendForgotEmail(email);
+        return ResponseEntity.ok("Ok");
+    }
+
+    @PostMapping("/update-password")
+    public ResponseEntity<String> updatePassword(@RequestParam UUID token, @RequestBody String password) {
+        userService.updatePassword(token, password);
+        return ResponseEntity.ok("Ok");
     }
 
     @PostMapping("/confirm")

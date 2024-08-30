@@ -59,10 +59,15 @@ public class UserService {
 
         final User savedUser = userRepository.save(user);
 
-        sendEmail(user);
+        sendEmail(user, "confirm", "VERIFY EMAIL");
 
         return userMapper.toUserDto(savedUser);
     }
+
+    public void sendForgotEmail(final String email) {
+        sendEmail(findUser(email), "forgot-password", "CHANGE PASSWORD");
+    }
+
 
     public UserDto findByLogin(String login) {
         final User user = findUser(login);
@@ -71,19 +76,38 @@ public class UserService {
 
     @Transactional
     public void confirmUser(final UUID confirmationToken) {
-        User user = userRepository.findByConfirmationToken(confirmationToken)
+        final User user = userRepository.findByConfirmationToken(confirmationToken)
                 .orElseThrow(() -> new AppException("Unknown user with this confirmation token", HttpStatus.NOT_FOUND));
         user.setEnabled(true);
         userRepository.save(user);
     }
 
-    private void sendEmail(final User user) {
+    @Transactional
+    public void updatePassword(final UUID confirmationToken, final String password) {
+        final User user = userRepository.findByConfirmationToken(confirmationToken)
+                .orElseThrow(() -> new AppException("Unknown user with this confirmation token", HttpStatus.NOT_FOUND));
+
+        final String newPassword = passwordEncoder.encode(CharBuffer.wrap(password));
+
+        if (newPassword.matches(user.getPassword())) {
+            throw new AppException("Do not use old password, please.", HttpStatus.BAD_REQUEST);
+        }
+
+        if (!user.isEnabled()) {
+            throw new AppException("Email is not activated", HttpStatus.BAD_REQUEST);
+        }
+
+        user.setPassword(newPassword);
+        userRepository.save(user);
+    }
+
+    private void sendEmail(final User user, final String type, final String messageButton) {
         final MimeMessage mimeMessage = emailService.createMimeMessage();
         try {
             final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
             helper.setTo(user.getLogin());
-            helper.setSubject("Verify your registration, please.");
-            final String content = createEmailContent(user.getFirstName(), user.getConfirmationToken());
+            helper.setSubject("Diet dash (" + type + ").");
+            final String content = createEmailContent(user.getFirstName(), user.getConfirmationToken(), type, messageButton);
             helper.setText(content, true);
         } catch (MessagingException ex) {
             throw new AppException("Cannot send email", HttpStatus.BAD_REQUEST);
@@ -96,16 +120,16 @@ public class UserService {
                 .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
     }
 
-    private String createEmailContent(final String name, final UUID confirmationToken) {
+    private String createEmailContent(final String name, final UUID confirmationToken, final String type, final String messageButton) {
         return "<html>"
                 + "<body style='font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;'>"
                 + "<div style='max-width: 600px; margin: 20px auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);'>"
-                + "<h2 style='color: #333333; text-align: center;'>Verify Your Registration</h2>"
+                + "<h2 style='color: #333333; text-align: center;'>Diet dash instructions. </h2>"
                 + "<p style='font-size: 16px; color: #666666;'>Dear " + name + ",</p>"
-                + "<p style='font-size: 16px; color: #666666;'>Please click the link below to verify your registration:</p>"
+                + "<p style='font-size: 16px; color: #666666;'>Please click the button below and follow instructions: </p>"
                 + "<div style='text-align: center; margin: 20px;'>"
-                + "<a href='https://diet-dash.com/login?token=" + confirmationToken
-                + "' style='font-size: 18px; color: #ffffff; background-color: #4CAF50; text-decoration: none; padding: 10px 20px; border-radius: 5px; display: inline-block;'>VERIFY</a>"
+                + "<a href='https://diet-dash.com/" + type + "?token=" + confirmationToken
+                + "' style='font-size: 18px; color: #ffffff; background-color: #4CAF50; text-decoration: none; padding: 10px 20px; border-radius: 5px; display: inline-block;'>" + messageButton + "</a>"
                 + "</div>"
                 + "<p style='font-size: 14px; color: #666666;'>Thank you,<br>The Diet Dash Team</p>"
                 + "</div>"

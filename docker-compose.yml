@@ -20,6 +20,15 @@ services:
     networks:
       - my_network
 
+  ngrok:
+    image: ngrok/ngrok:latest
+    network_mode: "host"
+    environment:
+      - NGROK_AUTHTOKEN=2kkw9vcj4GhrhIo8yNWVf8metDS_6tRaEr1QoovAFFFgVLRk
+    command: http --domain=chief-oriole-relative.ngrok-free.app 8080
+    stdin_open: true   # Equivalent to -it
+    tty: true          # Equivalent to -it
+
   diet_dash:
     image: diet-dash-image
     container_name: diet-dash-backend

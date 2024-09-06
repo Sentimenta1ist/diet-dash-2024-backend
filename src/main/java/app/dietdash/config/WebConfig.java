@@ -27,6 +27,9 @@ public class WebConfig {
         config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
+        // Explicitly allow specific headers related to file downloading
+        config.addExposedHeader("Content-Disposition");
+        config.addExposedHeader("Content-Type");
         config.setMaxAge(MAX_AGE);
         source.registerCorsConfiguration("/**", config);
         FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));

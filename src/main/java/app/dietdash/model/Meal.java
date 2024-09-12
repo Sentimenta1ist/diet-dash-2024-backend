@@ -1,8 +1,9 @@
 package app.dietdash.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,15 +30,19 @@ import java.time.LocalTime;
 public class Meal {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @JsonIgnore
     Integer id;
 
     @JsonFormat(pattern = "HH:mm")
     LocalTime time;
 
-    int amount;
+    int grams;
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     Product product;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ration_id", referencedColumnName = "id")
+    Ration ration;
 }

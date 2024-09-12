@@ -34,4 +34,11 @@ public class ProductController {
         productService.createProduct(product);
         return ResponseEntity.ok("Product added");
     }
+
+    @PostMapping("/fill")
+    public ResponseEntity<String> addProduct() {
+        productService.fill();
+        return ResponseEntity.ok("Filled.");
+    }
+
 }

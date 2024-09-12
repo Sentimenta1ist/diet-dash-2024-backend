@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
@@ -34,39 +35,34 @@ public class RationService {
     private final MealRepository mealRepository;
     private final ProductRepository productRepository;
 
-    public String addMealToRation(MealDto meal, UUID profileId, LocalDate date) {
+    @Transactional
+    public void addMealToRation(MealDto meal, UUID profileId, LocalDate date) {
 
         Profile profile = profileService.getProfileById(profileId);
 
-        final Optional<Product> product = productRepository.findById(meal.getProductId());
-        if (product.isEmpty()) {
-            return "Product with id {" + meal.getProductId() + "} does not exist";
-        }
+        final Product product = productRepository.findById(meal.getProductId())
+                .orElseThrow(() -> new AppException("Unknown profile with id: " + meal.getProductId(), HttpStatus.NOT_FOUND));
+
+        final Ration ration = rationRepository.findByProfileAndDate(profile, date)
+                .orElse(Ration.builder()
+                        .meals(List.of())
+                        .date(date)
+                        .profile(profile)
+                        .build());
+
+        rationRepository.save(ration);
 
         final Meal mealEntity = Meal.builder()
-                .amount(meal.getAmount())
-                .product(product.get())
+                .grams(meal.getGrams())
+                .product(product)
                 .time(meal.getTime())
+                .ration(ration)
                 .build();
 
         mealRepository.save(mealEntity);
-
-        final Optional<Ration> ration = rationRepository.findByProfileAndDate(profile, date);
-
-        if (ration.isEmpty()) {
-            final Ration newRation = Ration.builder()
-                    .meals(List.of(mealEntity))
-                    .date(date)
-                    .profile(profile)
-                    .build();
-
-            rationRepository.save(newRation);
-        } else {
-            ration.get().getMeals().add(mealEntity);
-            rationRepository.save(ration.get());
+        if(ration.getMeals() == null) {
+            ration.setMeals(List.of(mealEntity));
         }
-
-        return "Saved.";
     }
 
     public Ration getRationByProfileAndDate(final UUID profileId, final LocalDate date) {
@@ -77,6 +73,7 @@ public class RationService {
                 .orElse(null);
     }
 
+    @Transactional
     public void addMeal(MealDto mealDto) {
 
         final Optional<Product> product = productRepository.findById(mealDto.getProductId());
@@ -85,12 +82,30 @@ public class RationService {
         }
 
         final Meal mealEntity = Meal.builder()
-                .amount(mealDto.getAmount())
+                .grams(mealDto.getGrams())
                 .product(product.get())
                 .time(mealDto.getTime())
                 .build();
 
         mealRepository.save(mealEntity);
+    }
+
+    @Transactional
+    public void deleteMeal(final Integer mealId) {
+        Meal meal = mealRepository.findById(mealId)
+                .orElseThrow(() -> new AppException("Unknown meal with id: " + mealId, HttpStatus.NOT_FOUND));
+        mealRepository.delete(meal);
+    }
+
+    @Transactional
+    public void updateMeal(final Integer mealId, final MealDto updateMeal) {
+        Meal meal = mealRepository.findById(mealId)
+                .orElseThrow(() -> new AppException("Unknown profile with id: " + mealId, HttpStatus.NOT_FOUND));
+
+        meal.setGrams(updateMeal.getGrams());
+        meal.setTime(updateMeal.getTime());
+
+        mealRepository.save(meal);
     }
 
     public byte[] exportXlsx(final LocalDate start, final LocalDate end, final UUID profileId) {
@@ -114,7 +129,7 @@ public class RationService {
                 Row headerRow = sheet.createRow(0);
                 headerRow.createCell(0).setCellValue("Meal Time");
                 headerRow.createCell(1).setCellValue("Product Name");
-                headerRow.createCell(2).setCellValue("Amount (grams)");
+                headerRow.createCell(2).setCellValue("Grams");
 
 
                 Ration ration = getRationByProfileAndDate(profileId, date);
@@ -127,7 +142,7 @@ public class RationService {
                         Row row = sheet.createRow(rowNum++);
                         row.createCell(0).setCellValue(meal.getTime().toString());
                         row.createCell(1).setCellValue(meal.getProduct().getName());
-                        row.createCell(2).setCellValue(meal.getAmount());
+                        row.createCell(2).setCellValue(meal.getGrams());
                     }
                 }
                 date = date.plusDays(1);

@@ -18,7 +18,7 @@ public class MealDto {
     @JsonFormat(pattern = "HH:mm")
     LocalTime time;
 
-    int amount;
+    int grams;
 
     Integer productId;
 }

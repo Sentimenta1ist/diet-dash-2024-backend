@@ -39,7 +39,7 @@ public class Ration {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
-    @OneToMany
+    @OneToMany(mappedBy = "ration")
     private List<Meal> meals = new ArrayList<>();
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

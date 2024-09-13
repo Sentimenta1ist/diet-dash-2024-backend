@@ -6,12 +6,15 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.init.ResourceReader;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -29,7 +32,9 @@ public class ProductService {
 
     public void fill() {
 
-        try (BufferedReader br = new BufferedReader(new FileReader("/home/ubuntu/diet-dash/src/main/resources/utils/file.csv"))) {
+        try (InputStream inputStream = ResourceReader.class.getClassLoader().getResourceAsStream("utils/file.csv");
+             BufferedReader br = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)))) {
+
             String line;
 
             while ((line = br.readLine()) != null) {

@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-@Getter
 @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -36,7 +36,7 @@ public class Profile {
     private int age;
     private String gender;
     private int height;
-    private int weight;
+    private double weight;
     private int waist;
     private int hips;
     private int goalWeight;
@@ -44,9 +44,9 @@ public class Profile {
     private double bodyMassIndex;
     private int dailyCalorieNorm;
     private int selectedCalorieLimit;
-    private float dailyProteinLimit;
-    private float dailyFatLimit;
-    private float dailyCarbsLimit;
+    private int dailyProteinLimit;
+    private int dailyFatLimit;
+    private int dailyCarbsLimit;
 
     @OneToMany(mappedBy = "profile")
     @JsonIgnore
@@ -56,4 +56,5 @@ public class Profile {
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
+
 }

@@ -29,7 +29,7 @@ public class ProductService {
 
     public void fill() {
 
-        try (BufferedReader br = new BufferedReader(new FileReader("src/main/resources/utils/file.csv"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("/home/ubuntu/diet-dash/src/main/resources/utils/file.csv"))) {
             String line;
 
             while ((line = br.readLine()) != null) {

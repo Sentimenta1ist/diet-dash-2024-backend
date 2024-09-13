@@ -35,7 +35,7 @@ public class ProductController {
         return ResponseEntity.ok("Product added");
     }
 
-    @PostMapping("/fill")
+    @PostMapping("/fill-prod")
     public ResponseEntity<String> addProduct() {
         productService.fill();
         return ResponseEntity.ok("Filled.");

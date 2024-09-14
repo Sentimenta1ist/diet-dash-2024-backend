@@ -23,7 +23,7 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<Page<Product>> getAllProducts(@RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "15") int size,
+                                                        @RequestParam(defaultValue = "100") int size,
                                                         @RequestParam(required = false) String term) {
         final Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(productService.getProductsPage(term, pageable));

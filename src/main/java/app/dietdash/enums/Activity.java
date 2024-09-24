@@ -1,31 +1,25 @@
 package app.dietdash.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
 public enum Activity {
-    NO_ACTIVITY(0, "Без активності (ООВ * 1)", 1.0),
-    ACTIVE(1, "Помірна активність (ООВ * 1.55)", 1.55),
-    VERY_ACTIVE(2, "Висока активність (ООВ * 2)", 2);
+    NO_ACTIVITY(0, "Без врахування навантаження (ООВ * 1)", 1.0),
+    SITTING(1, "Сидячий спосіб життя (ООВ * 1.2)", 1.2),
+    EASY(2, "Мала активність (ООВ * 1.375)", 1.375),
+    MEDIUM(3, "Помірна активність (ООВ * 1.55)", 1.55),
+    HARD(4, "Висока активність (ООВ * 1.725)", 1.725),
+    VERY_HARD(5, "Дуже висока активність (ООВ * 1.9)", 1.9);
 
     final int id;
     final String description;
-
-    @JsonIgnore
-    final double coe;
+    final double multiplier;
 
     Activity(int id, String description, double coe) {
         this.id = id;
         this.description = description;
-        this.coe = coe;
-    }
-
-    @JsonValue
-    public String getDescription() {
-        return description;
+        this.multiplier = coe;
     }
 
     @JsonCreator

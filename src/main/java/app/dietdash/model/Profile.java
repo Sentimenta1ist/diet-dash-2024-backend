@@ -1,5 +1,6 @@
 package app.dietdash.model;
 
+import app.dietdash.dto.ActivityDto;
 import app.dietdash.enums.Activity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
@@ -57,4 +58,7 @@ public class Profile {
     @JsonIgnore
     private User user;
 
+    public ActivityDto getActivity() {
+        return new ActivityDto(activity.getId(), activity.getDescription(), activity.getMultiplier());
+    }
 }

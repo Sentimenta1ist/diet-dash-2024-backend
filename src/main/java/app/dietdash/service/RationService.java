@@ -10,15 +10,24 @@ import app.dietdash.repository.ProductRepository;
 import app.dietdash.repository.RationRepository;
 import exceptions.AppException;
 import lombok.AllArgsConstructor;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -60,7 +69,7 @@ public class RationService {
                 .build();
 
         mealRepository.save(mealEntity);
-        if(ration.getMeals() == null) {
+        if (ration.getMeals() == null) {
             ration.setMeals(List.of(mealEntity));
         }
     }
@@ -121,28 +130,66 @@ public class RationService {
             // Write the output to a byte array
             ByteArrayOutputStream out = new ByteArrayOutputStream();
 
+            Sheet sheet = workbook.createSheet("Diet plan");
+
+            // Set the column widths
+            sheet.setColumnWidth(0, 6000); // Set width for "Meal Time"
+            sheet.setColumnWidth(1, 6000); // Set width for "Grams"
+            sheet.setColumnWidth(2, 12000); // Set width for "Product Name"
+
+            // Create header row
+            int rowNum = 0;
+            Row headerRow = sheet.createRow(rowNum++);
+            headerRow.setHeightInPoints(22);
+
+            Cell headerCell1 = headerRow.createCell(0);
+            headerCell1.setCellValue("Час прийому");
+            headerCell1.setCellStyle(createCellStyle(workbook, IndexedColors.PALE_BLUE, HorizontalAlignment.CENTER, true));
+
+            Cell headerCell2 = headerRow.createCell(1);
+            headerCell2.setCellValue("Кількість (гр)");
+            headerCell2.setCellStyle(createCellStyle(workbook, IndexedColors.LIGHT_GREEN, HorizontalAlignment.CENTER, true));
+
+            Cell headerCell3 = headerRow.createCell(2);
+            headerCell3.setCellValue("Назва продукту");
+            headerCell3.setCellStyle(createCellStyle(workbook, IndexedColors.TAN, HorizontalAlignment.CENTER, true));
+
             while (!date.isAfter(end)) {
-                // Create a sheet
-                Sheet sheet = workbook.createSheet(date.format(DateTimeFormatter.ISO_DATE));
-
-                // Create header row
-                Row headerRow = sheet.createRow(0);
-                headerRow.createCell(0).setCellValue("Meal Time");
-                headerRow.createCell(1).setCellValue("Product Name");
-                headerRow.createCell(2).setCellValue("Grams");
-
+                // Merge cells to display the day of the week with the date
+                Row dateRow = sheet.createRow(rowNum++);
+                // Merge across the first three columns for the day
+                Cell dateCell = dateRow.createCell(0);
+                Cell date2Cell = dateRow.createCell(1);
+                Cell date3Cell = dateRow.createCell(2);
+                String dayWithDate = uaTransform(date.getDayOfWeek()) + " (" + date.format(DateTimeFormatter.ofPattern("dd/MM")) + ")";
+                dateCell.setCellValue(dayWithDate);
+                sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 2));
+                dateCell.setCellStyle(createCellStyle(workbook, IndexedColors.GREY_25_PERCENT, HorizontalAlignment.CENTER, false));
+                date2Cell.setCellStyle(createCellStyle(workbook, IndexedColors.GREY_25_PERCENT, HorizontalAlignment.CENTER, false));
+                date3Cell.setCellStyle(createCellStyle(workbook, IndexedColors.GREY_25_PERCENT, HorizontalAlignment.CENTER, false));
 
                 Ration ration = getRationByProfileAndDate(profileId, date);
                 if (ration != null) {
-                    int rowNum = 1;
+
                     List<Meal> sortedMeals = ration.getMeals().stream()
                             .sorted(Comparator.comparing(Meal::getTime))
                             .toList();
-                    for (Meal meal : sortedMeals) {
+
+                    for (int i = 0; i < sortedMeals.size(); i++) {
+                        Meal meal = sortedMeals.get(i);
                         Row row = sheet.createRow(rowNum++);
-                        row.createCell(0).setCellValue(meal.getTime().toString());
-                        row.createCell(1).setCellValue(meal.getProduct().getName());
-                        row.createCell(2).setCellValue(meal.getGrams());
+                        row.setHeightInPoints(22);
+                        if (i > 0 && sortedMeals.get(i - 1).getTime().equals(meal.getTime())) {
+                            row.createCell(0).setCellValue("");
+                        } else {
+                            row.createCell(0).setCellValue(meal.getTime().toString());
+                        }
+                        row.createCell(1).setCellValue(meal.getGrams());
+                        row.createCell(2).setCellValue(meal.getProduct().getName());
+
+                        for (int j = 0; j < 3; j++) {
+                            row.getCell(j).setCellStyle(createCellStyle(workbook, IndexedColors.WHITE, HorizontalAlignment.LEFT, false));
+                        }
                     }
                 }
                 date = date.plusDays(1);
@@ -155,4 +202,47 @@ public class RationService {
         }
     }
 
+    private CellStyle createCellStyle(Workbook workbook, IndexedColors backgroundColor, HorizontalAlignment alignment, boolean bold) {
+        CellStyle style = workbook.createCellStyle();
+
+        // Set font style
+        Font font = workbook.createFont();
+        font.setBold(bold);
+        font.setFontName("Arial");
+        font.setFontHeightInPoints((short) 16);
+        font.setColor(IndexedColors.GREY_80_PERCENT.getIndex()); // Set header font color to white
+        style.setFont(font);
+
+        // Set background color and fill pattern
+        style.setFillForegroundColor(backgroundColor.getIndex()); // Custom background color
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setAlignment(alignment);
+
+        // Add borders to the cell
+        style.setBorderTop(BorderStyle.THIN);   // Top border
+        style.setBorderBottom(BorderStyle.THIN); // Bottom border
+        style.setBorderLeft(BorderStyle.THIN);   // Left border
+        style.setBorderRight(BorderStyle.THIN);  // Right border
+
+        // Set border color (optional, you can use a different color)
+        style.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
+
+
+        return style;
+    }
+
+    private String uaTransform(DayOfWeek dayOfWeek) {
+        return switch (dayOfWeek) {
+            case MONDAY -> "Понеділок";
+            case TUESDAY -> "Вівторок";
+            case WEDNESDAY -> "Середа";
+            case THURSDAY -> "Четвер";
+            case FRIDAY -> "Пʼятниця";
+            case SATURDAY -> "Субота";
+            case SUNDAY -> "Неділя";
+        };
+    }
 }

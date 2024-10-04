@@ -39,9 +39,7 @@ public class ProductService {
              BufferedReader br = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)))) {
 
             String line;
-            int counter = 0;
-            while ((line = br.readLine()) != null && counter < 30) {
-                counter++;
+            while ((line = br.readLine()) != null) {
 
                 // Split the line by commas
                 String[] values = line.split(",");

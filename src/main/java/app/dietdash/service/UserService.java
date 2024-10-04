@@ -108,7 +108,7 @@ public class UserService {
             final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
             helper.setTo(user.getLogin());
             helper.setSubject("Diet dash (" + type + ").");
-            final String content = createEmailContent(user.getFirstName(), user.getConfirmationToken(), type, messageButton);
+            final String content = createEmailContent(user.getConfirmationToken(), type, messageButton);
             helper.setText(content, true);
         } catch (MessagingException ex) {
             throw new AppException("Cannot send email", HttpStatus.BAD_REQUEST);
@@ -121,12 +121,12 @@ public class UserService {
                 .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
     }
 
-    private String createEmailContent(final String name, final UUID confirmationToken, final String type, final String messageButton) {
+    private String createEmailContent(final UUID confirmationToken, final String type, final String messageButton) {
         return "<html>"
                 + "<body style='font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;'>"
                 + "<div style='max-width: 600px; margin: 20px auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);'>"
                 + "<h2 style='color: #333333; text-align: center;'>Diet dash instructions. </h2>"
-                + "<p style='font-size: 16px; color: #666666;'>Dear " + name + ",</p>"
+                + "<p style='font-size: 16px; color: #666666;'>Dear customer,</p>"
                 + "<p style='font-size: 16px; color: #666666;'>Please click the button below and follow instructions: </p>"
                 + "<div style='text-align: center; margin: 20px;'>"
                 + "<a href='https://diet-dash.com/" + type + "?token=" + confirmationToken

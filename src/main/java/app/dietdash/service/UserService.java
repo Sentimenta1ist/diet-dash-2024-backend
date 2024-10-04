@@ -101,6 +101,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+
     private void sendEmail(final User user, final String type, final String messageButton) {
         final MimeMessage mimeMessage = emailService.createMimeMessage();
         try {

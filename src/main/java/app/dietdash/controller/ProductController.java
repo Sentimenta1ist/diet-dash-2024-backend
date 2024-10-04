@@ -1,5 +1,6 @@
 package app.dietdash.controller;
 
+import app.dietdash.dto.UserDto;
 import app.dietdash.model.Product;
 import app.dietdash.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,8 +32,8 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<String> addProduct(@RequestBody Product product) {
-        productService.createProduct(product);
+    public ResponseEntity<String> addProduct(@RequestBody Product product,  @AuthenticationPrincipal UserDto principal) {
+        productService.createProduct(product, principal);
         return ResponseEntity.ok("Product added");
     }
 

@@ -55,8 +55,16 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Profile> profileList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Product> productList = new ArrayList<>();
+
     public void addProfile(final Profile profile) {
         profileList.add(profile);
         profile.setUser(this);
+    }
+
+    public void addProduct(final Product product) {
+        productList.add(product);
+        product.setUser(this);
     }
 }

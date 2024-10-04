@@ -1,6 +1,8 @@
 package app.dietdash.service;
 
+import app.dietdash.dto.UserDto;
 import app.dietdash.model.Product;
+import app.dietdash.model.User;
 import app.dietdash.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +22,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final UtilService utilService;
 
     public Page<Product> getProductsPage(final String term, final Pageable pageable) {
         if (term == null) {
@@ -36,8 +39,9 @@ public class ProductService {
              BufferedReader br = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)))) {
 
             String line;
-
-            while ((line = br.readLine()) != null) {
+            int counter = 0;
+            while ((line = br.readLine()) != null && counter < 30) {
+                counter++;
 
                 // Split the line by commas
                 String[] values = line.split(",");
@@ -52,7 +56,7 @@ public class ProductService {
                 float carbs = Float.parseFloat(values[4].trim());
 
                 // Create a new Product object
-                Product product = new Product(null, name, calories, proteins, fats, carbs);
+                Product product = new Product(null, name, calories, proteins, fats, carbs, null);
 
                 // Add the Product to the list
                 productRepository.save(product);
@@ -65,9 +69,11 @@ public class ProductService {
 
 
     @Transactional
-    public void createProduct(Product product) {
+    public void createProduct(Product product, UserDto principal) {
+        final User user = utilService.getUserFromPrincipal(principal);
         product.setName(product.getName().toLowerCase());
-        productRepository.save(product);
+        Product entity = productRepository.save(product);
+        user.addProduct(entity);
     }
 
     @Transactional

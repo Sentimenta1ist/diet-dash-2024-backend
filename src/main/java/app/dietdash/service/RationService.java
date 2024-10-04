@@ -133,9 +133,9 @@ public class RationService {
             Sheet sheet = workbook.createSheet("Diet plan");
 
             // Set the column widths
-            sheet.setColumnWidth(0, 6000); // Set width for "Meal Time"
-            sheet.setColumnWidth(1, 6000); // Set width for "Grams"
-            sheet.setColumnWidth(2, 12000); // Set width for "Product Name"
+            sheet.setColumnWidth(0, 4000); // Set width for "Meal Time"
+            sheet.setColumnWidth(1, 14000); // Set width for "Product Name"
+            sheet.setColumnWidth(2, 4000); // Set width for "Grams"
 
             // Create header row
             int rowNum = 0;
@@ -143,16 +143,17 @@ public class RationService {
             headerRow.setHeightInPoints(22);
 
             Cell headerCell1 = headerRow.createCell(0);
-            headerCell1.setCellValue("Час прийому");
+            headerCell1.setCellValue("Час");
             headerCell1.setCellStyle(createCellStyle(workbook, IndexedColors.PALE_BLUE, HorizontalAlignment.CENTER, true));
 
-            Cell headerCell2 = headerRow.createCell(1);
-            headerCell2.setCellValue("Кількість (гр)");
-            headerCell2.setCellStyle(createCellStyle(workbook, IndexedColors.LIGHT_GREEN, HorizontalAlignment.CENTER, true));
 
-            Cell headerCell3 = headerRow.createCell(2);
+            Cell headerCell3 = headerRow.createCell(1);
             headerCell3.setCellValue("Назва продукту");
             headerCell3.setCellStyle(createCellStyle(workbook, IndexedColors.TAN, HorizontalAlignment.CENTER, true));
+
+            Cell headerCell2 = headerRow.createCell(2);
+            headerCell2.setCellValue("Порція(г)");
+            headerCell2.setCellStyle(createCellStyle(workbook, IndexedColors.LIGHT_GREEN, HorizontalAlignment.CENTER, true));
 
             while (!date.isAfter(end)) {
                 // Merge cells to display the day of the week with the date
@@ -177,19 +178,21 @@ public class RationService {
 
                     for (int i = 0; i < sortedMeals.size(); i++) {
                         Meal meal = sortedMeals.get(i);
+                        if (i > 0 && !sortedMeals.get(i - 1).getTime().equals(meal.getTime())) {
+                            Row row = sheet.createRow(rowNum++);
+                            row.setHeightInPoints(15);
+                        }
                         Row row = sheet.createRow(rowNum++);
                         row.setHeightInPoints(22);
-                        if (i > 0 && sortedMeals.get(i - 1).getTime().equals(meal.getTime())) {
-                            row.createCell(0).setCellValue("");
-                        } else {
-                            row.createCell(0).setCellValue(meal.getTime().toString());
-                        }
-                        row.createCell(1).setCellValue(meal.getGrams());
-                        row.createCell(2).setCellValue(meal.getProduct().getName());
 
-                        for (int j = 0; j < 3; j++) {
-                            row.getCell(j).setCellStyle(createCellStyle(workbook, IndexedColors.WHITE, HorizontalAlignment.LEFT, false));
-                        }
+                        row.createCell(0).setCellValue(meal.getTime().toString() + " ");
+                        row.createCell(1).setCellValue(" " + meal.getProduct().getName());
+                        row.createCell(2).setCellValue(meal.getGrams());
+
+                        row.getCell(0).setCellStyle(createCellStyle(workbook, IndexedColors.WHITE, HorizontalAlignment.RIGHT, false));
+                        row.getCell(1).setCellStyle(createCellStyle(workbook, IndexedColors.WHITE, HorizontalAlignment.LEFT, false));
+                        row.getCell(2).setCellStyle(createCellStyle(workbook, IndexedColors.WHITE, HorizontalAlignment.LEFT, false));
+
                     }
                 }
                 date = date.plusDays(1);

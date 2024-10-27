@@ -48,6 +48,9 @@ public class Profile {
     private int dailyProteinLimit;
     private int dailyFatLimit;
     private int dailyCarbsLimit;
+    private double dailyProteinPercentage;
+    private double dailyFatPercentage;
+    private double dailyCarbsPercentage;
 
     @OneToMany(mappedBy = "profile")
     @JsonIgnore

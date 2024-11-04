@@ -28,7 +28,6 @@ import java.util.UUID;
 public class RationController {
 
     private final RationService rationService;
-    private final MealRepository mealRepository;
 
     @GetMapping("/{profileId}")
     public ResponseEntity<Ration> getRation(
@@ -67,6 +66,15 @@ public class RationController {
     public ResponseEntity<String> addMeal(@RequestBody MealDto meal) {
         rationService.addMeal(meal);
         return ResponseEntity.ok("Added");
+    }
+
+    @PostMapping("/duplicate/{profileId}")
+    public ResponseEntity<String> duplicateRation(
+            @PathVariable UUID profileId,
+            @RequestParam("sourceDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate sourceDate,
+            @RequestParam("targetDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate) {
+        rationService.duplicateRationToDate(profileId, sourceDate, targetDate);
+        return ResponseEntity.ok("Duplicated.");
     }
 
     @GetMapping("/export")

@@ -117,6 +117,37 @@ public class RationService {
         mealRepository.save(meal);
     }
 
+    @Transactional
+    public void duplicateRationToDate(UUID profileId, LocalDate sourceDate, LocalDate targetDate) {
+        if (sourceDate.isEqual(targetDate)) {
+            throw new AppException("Source date and target date cannot be the same.", HttpStatus.BAD_REQUEST);
+        }
+
+        Profile profile = profileService.getProfileById(profileId);
+
+        Ration sourceRation = rationRepository.findByProfileAndDate(profile, sourceDate)
+                .orElseThrow(() -> new AppException("No ration found for the given date.", HttpStatus.NOT_FOUND));
+
+        Ration targetRation = rationRepository.findByProfileAndDate(profile, targetDate)
+                .orElse(Ration.builder()
+                        .profile(profile)
+                        .date(targetDate)
+                        .meals(List.of())
+                        .build());
+
+        rationRepository.save(targetRation);
+
+        sourceRation.getMeals().forEach(meal -> {
+            Meal duplicatedMeal = Meal.builder()
+                    .grams(meal.getGrams())
+                    .product(meal.getProduct())
+                    .time(meal.getTime())
+                    .ration(targetRation)
+                    .build();
+            mealRepository.save(duplicatedMeal);
+        });
+    }
+
     public byte[] exportXlsx(final LocalDate start, final LocalDate end, final UUID profileId) {
 
         if (start.isAfter(end)) {

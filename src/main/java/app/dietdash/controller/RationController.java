@@ -2,7 +2,7 @@ package app.dietdash.controller;
 
 import app.dietdash.dto.MealDto;
 import app.dietdash.model.Ration;
-import app.dietdash.repository.MealRepository;
+import app.dietdash.service.ExportService;
 import app.dietdash.service.RationService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,6 +28,7 @@ import java.util.UUID;
 public class RationController {
 
     private final RationService rationService;
+    private final ExportService exportService;
 
     @GetMapping("/{profileId}")
     public ResponseEntity<Ration> getRation(
@@ -77,8 +78,8 @@ public class RationController {
         return ResponseEntity.ok("Duplicated.");
     }
 
-    @GetMapping("/export")
-    public ResponseEntity<byte[]> exportRation(
+    @GetMapping("/exportXlsx")
+    public ResponseEntity<byte[]> exportRationXlsx(
             @RequestParam("profileId") UUID profileId,
             @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
@@ -86,7 +87,19 @@ public class RationController {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=rations.xlsx");
         headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        return new ResponseEntity<>(rationService.exportXlsx(start, end, profileId), headers, HttpStatus.OK);
+        return new ResponseEntity<>(exportService.exportXlsx(start, end, profileId), headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportRationDoc(
+            @RequestParam("profileId") UUID profileId,
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+        // Create HTTP response with Excel content
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=rations.xlsx");
+        headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        return new ResponseEntity<>(exportService.exportDoc(start, end, profileId), headers, HttpStatus.OK);
     }
 
 }

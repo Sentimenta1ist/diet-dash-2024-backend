@@ -99,7 +99,7 @@ public class RationController {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=rations.xlsx");
         headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        return new ResponseEntity<>(exportService.exportDoc(start, end, profileId), headers, HttpStatus.OK);
+        return new ResponseEntity<>(exportService.exportXlsx(start, end, profileId), headers, HttpStatus.OK);
     }
 
 }

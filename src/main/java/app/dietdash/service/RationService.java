@@ -105,40 +105,45 @@ public class RationService {
     }
 
     @Transactional
-    public void duplicateRationToDate(UUID profileId, LocalDate sourceDate, LocalDate targetDate) {
-        if (sourceDate.isEqual(targetDate)) {
-            throw new AppException("Source date and target date cannot be the same.", HttpStatus.BAD_REQUEST);
-        }
-
+    public void duplicateRationToDate(UUID profileId, LocalDate sourceDate, List<LocalDate> targetDates) {
         Profile profile = profileService.getProfileById(profileId);
 
         Ration sourceRation = rationRepository.findByProfileAndDate(profile, sourceDate)
                 .orElseThrow(() -> new AppException("No ration found for the given date.", HttpStatus.NOT_FOUND));
 
-        Ration targetRation = rationRepository.findByProfileAndDate(profile, targetDate)
-                .orElse(Ration.builder()
-                        .profile(profile)
-                        .date(targetDate)
-                        .meals(emptyList())
-                        .build());
+        for (LocalDate targetDate : targetDates) {
 
-        // Clear all meals in the target ration before duplicating
-        List<Meal> existingMeals = new ArrayList<>(targetRation.getMeals());
+            if (sourceDate.isEqual(targetDate)) {
+                continue; // skip duplicating of current date
+            }
 
-        if(!existingMeals.isEmpty()) {
-            mealRepository.deleteAll(existingMeals); // Delete each meal
-            targetRation.getMeals().clear(); // Clear the in-memory collection
+            Ration targetRation = rationRepository.findByProfileAndDate(profile, targetDate)
+                    .orElse(Ration.builder()
+                            .profile(profile)
+                            .date(targetDate)
+                            .meals(emptyList())
+                            .build());
+
+            // Clear all meals in the target ration before duplicating
+            List<Meal> existingMeals = new ArrayList<>(targetRation.getMeals());
+
+            if (!existingMeals.isEmpty()) {
+                mealRepository.deleteAll(existingMeals); // Delete each meal
+                targetRation.getMeals().clear(); // Clear the in-memory collection
+            }
+
+            rationRepository.save(targetRation);
+            sourceRation.getMeals().forEach(meal -> {
+                Meal duplicatedMeal = Meal.builder()
+                        .grams(meal.getGrams())
+                        .product(meal.getProduct())
+                        .time(meal.getTime())
+                        .ration(targetRation)
+                        .build();
+                mealRepository.save(duplicatedMeal);
+            });
         }
 
-        rationRepository.save(targetRation);
-        sourceRation.getMeals().forEach(meal -> {
-            Meal duplicatedMeal = Meal.builder()
-                    .grams(meal.getGrams())
-                    .product(meal.getProduct())
-                    .time(meal.getTime())
-                    .ration(targetRation)
-                    .build();
-            mealRepository.save(duplicatedMeal);
-        });
+
     }
 }

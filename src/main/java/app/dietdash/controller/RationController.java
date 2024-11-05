@@ -1,5 +1,6 @@
 package app.dietdash.controller;
 
+import app.dietdash.dto.LocalDatesDto;
 import app.dietdash.dto.MealDto;
 import app.dietdash.model.Ration;
 import app.dietdash.service.ExportService;
@@ -73,8 +74,8 @@ public class RationController {
     public ResponseEntity<String> duplicateRation(
             @PathVariable UUID profileId,
             @RequestParam("sourceDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate sourceDate,
-            @RequestParam("targetDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate targetDate) {
-        rationService.duplicateRationToDate(profileId, sourceDate, targetDate);
+            @RequestBody LocalDatesDto localDatesDto) {
+        rationService.duplicateRationToDate(profileId, sourceDate, localDatesDto.getTargetDates());
         return ResponseEntity.ok("Duplicated.");
     }
 

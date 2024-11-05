@@ -25,7 +25,6 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Builder
 @Entity
-@ToString
 @Table(name = "meal")
 public class Meal {
     @Id
@@ -45,4 +44,14 @@ public class Meal {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ration_id", referencedColumnName = "id")
     Ration ration;
+
+    @Override
+    public String toString() {
+        return "Meal{" +
+                "id=" + id +
+                ", time=" + time +
+                ", product=" + getProduct().getName() +
+                ", grams=" + grams +
+                '}';
+    }
 }

@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.util.Collections.emptyList;
+
 @Service
 @AllArgsConstructor
 public class RationService {
@@ -117,14 +119,18 @@ public class RationService {
                 .orElse(Ration.builder()
                         .profile(profile)
                         .date(targetDate)
+                        .meals(emptyList())
                         .build());
 
         // Clear all meals in the target ration before duplicating
         List<Meal> existingMeals = new ArrayList<>(targetRation.getMeals());
-        mealRepository.deleteAll(existingMeals); // Delete each meal
-        targetRation.getMeals().clear(); // Clear the in-memory collection
-        rationRepository.save(targetRation);
 
+        if(!existingMeals.isEmpty()) {
+            mealRepository.deleteAll(existingMeals); // Delete each meal
+            targetRation.getMeals().clear(); // Clear the in-memory collection
+        }
+
+        rationRepository.save(targetRation);
         sourceRation.getMeals().forEach(meal -> {
             Meal duplicatedMeal = Meal.builder()
                     .grams(meal.getGrams())

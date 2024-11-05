@@ -95,8 +95,6 @@ public class ExportService {
                         addTableRow(table, meal);
                     }
                 }
-                document.createParagraph();
-
                 date = date.plusDays(1);
             }
 

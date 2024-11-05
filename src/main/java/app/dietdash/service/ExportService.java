@@ -23,19 +23,22 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTbl;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTrPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STHeightRule;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STMerge;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -51,73 +54,100 @@ public class ExportService {
             throw new AppException("startDate should be before or equal endDate", HttpStatus.BAD_REQUEST);
         }
 
-        LocalDate date = start;
-        // Create a new Word document
-//        XWPFDocument document = new XWPFDocument();
-//        List<Ration> rations = new ArrayList<>();
-//        rations.add(createMockRation1());
-//        rations.add(createMockRation2());
-//
-//        for (Ration ration : rations) {
-//
-//            // Add a table title
-//            XWPFParagraph title = document.createParagraph();
-//            XWPFRun titleRun = title.createRun();
-//            String dayWithDate = uaTransform(ration.getDate().getDayOfWeek()) + " (" + ration.getDate().format(DateTimeFormatter.ofPattern("dd/MM")) + ")";
-//            titleRun.setText(dayWithDate);
-//            titleRun.setBold(true);
-//            titleRun.setFontSize(12);
-//            title.setAlignment(ParagraphAlignment.LEFT);
-//
-//            // Create a table with 3 columns
-//            XWPFTable table = document.createTable();
-//
-//            // Set custom width for the table
-//            CTTblWidth tblWidth = table.getCTTbl().addNewTblPr().addNewTblW();
-//            tblWidth.setW(BigInteger.valueOf(8500));
-//            tblWidth.setType(STTblWidth.DXA);
-//
-//            // Add header row
-//            XWPFTableRow headerRow = table.getRow(0); // The first row is created by default
-//            formatHeaderCell(headerRow.getCell(0), "Час", "60d0fc", "000000"); // Time
-//            formatHeaderCell(headerRow.addNewTableCell(), "Назва продукту", "F4B084", "000000"); // Product Name
-//            formatHeaderCell(headerRow.addNewTableCell(), "Порція(г)", "A9D08E", "000000"); // Portion (g)
-//
-//
-//            for(Meal meal : ration.getMeals()) {
-//                addBlankRowWithMergedCells(table);
-//                addTableRow(table, meal);
-//            }
-//        }
-//
-//
-//        // Save the document to a file
-//        try (FileOutputStream out = new FileOutputStream("DietPlan.docx")) {
-//            document.write(out);
-//        }
-//
-//        System.out.println("Word document created successfully.");
-        return null;
+        try {
+            LocalDate date = start;
+            // Create a new Word document
+            XWPFDocument document = new XWPFDocument();
+            XWPFTable table = document.createTable();
+
+            // Disable Autofit for the table
+            CTTbl tableCT = table.getCTTbl();
+            CTTblPr tblPr = tableCT.getTblPr() == null ? tableCT.addNewTblPr() : tableCT.getTblPr();
+            tblPr.addNewTblW().setType(STTblWidth.DXA);
+            tblPr.getTblW().setW(BigInteger.valueOf(10000));
+
+            // Add header row
+            XWPFTableRow headerRow = table.getRow(0); // The first row is created by default
+            formatHeaderCell(headerRow.getCell(0), "Час", "afcefa", "000000"); // Time
+            formatHeaderCell(headerRow.addNewTableCell(), "    Назва продукту", "ffd194", "000000"); // Product Name
+            formatHeaderCell(headerRow.addNewTableCell(), "Порція(г)", "b2f7c5", "000000"); // Portion (g)
+            setRowMinHeight(headerRow, 400);
+            setColumnWidth(headerRow.getCell(0), 1000);
+            setColumnWidth(headerRow.getCell(1), 7500);
+            setColumnWidth(headerRow.getCell(2), 1500);
+
+            while (!date.isAfter(end)) {
+                Ration ration = rationService.getRationByProfileAndDate(profileId, date);
+                if (ration != null) {
+                    String dayWithDate = uaTransform(ration.getDate().getDayOfWeek()) + " (" + ration.getDate().format(DateTimeFormatter.ofPattern("dd/MM")) + ")";
+                    addMergedCells(table, dayWithDate, "c2c2c2", 400); // Date
+
+                    List<Meal> sortedMeals = ration.getMeals().stream()
+                            .sorted(Comparator.comparing(Meal::getTime))
+                            .toList();
+
+                    List<Meal> meals = ration.getMeals();
+                    for (int i = 0; i < meals.size(); i++) {
+                        Meal meal = sortedMeals.get(i);
+                        if (i > 0 && !sortedMeals.get(i - 1).getTime().equals(meal.getTime())) {
+                            addMergedCells(table, "", null, 200); // Space
+                        }
+                        addTableRow(table, meal);
+                    }
+                }
+                document.createParagraph();
+
+                date = date.plusDays(1);
+            }
+
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            document.write(out);
+            return out.toByteArray();
+
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new AppException("Error during the export.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    public static void setRowMinHeight(XWPFTableRow row, int height) {
+        CTTrPr trPr = row.getCtRow().addNewTrPr();
+        trPr.addNewTrHeight().setVal(BigInteger.valueOf(height));
+        trPr.getTrHeightArray(0).setHRule(STHeightRule.EXACT);
+    }
+
+    private static void setColumnWidth(XWPFTableCell cell, int width) {
+        CTTcPr tcPr = cell.getCTTc().addNewTcPr();
+        CTTblWidth cellWidth = tcPr.addNewTcW();
+        cellWidth.setW(BigInteger.valueOf(width));
     }
 
     private static void formatHeaderCell(XWPFTableCell cell, String text, String bgColor, String textColor) {
         XWPFParagraph paragraph = cell.getParagraphs().get(0);
         paragraph.setAlignment(ParagraphAlignment.CENTER);
 
+
         XWPFRun run = paragraph.createRun();
         run.setText(text);
         run.setBold(true);
         run.setColor(textColor);
-        run.setFontSize(12);
+        run.setFontSize(15);
 
         cell.setColor(bgColor); // Set background color
     }
 
     private static void addTableRow(XWPFTable table, Meal meal) {
         XWPFTableRow row = table.createRow();
+
+        setRowMinHeight(row, 400);
+
+        // Disable automatic row height adjustment to enforce the specified height
         setTableCellText(row.getCell(0), meal.getTime().toString(), ParagraphAlignment.CENTER);
         setTableCellText(row.getCell(1), " " + meal.getProduct().getName(), ParagraphAlignment.LEFT);
         setTableCellText(row.getCell(2), "" + meal.getGrams(), ParagraphAlignment.CENTER);
+
     }
 
     private static void setTableCellText(XWPFTableCell cell, String text, ParagraphAlignment alignment) {
@@ -126,19 +156,30 @@ public class ExportService {
 
         XWPFRun run = paragraph.createRun();
         run.setText(text);
-        run.setFontSize(11);
+        run.setFontSize(15);
     }
 
     // Insert this function to add a blank row with merged cells
-    private static void addBlankRowWithMergedCells(XWPFTable table) {
-        XWPFTableRow blankRow = table.createRow();
+    private static void addMergedCells(XWPFTable table, String text, String bgColor, int height) {
+        XWPFTableRow row = table.createRow();
 
-        // Create the first cell and set it to span across other cells
-        XWPFTableCell cell = blankRow.getCell(0);
-        cell.setText(""); // Leave text empty for spacing
+        setRowMinHeight(row, height);
 
-        // Merge the cells in this row across all three columns
-        mergeCellsHorizontal(blankRow, 0, 2);
+        XWPFTableCell cell = row.getCell(0);
+
+        XWPFParagraph paragraph = cell.getParagraphs().get(0);
+        paragraph.setAlignment(ParagraphAlignment.CENTER);
+
+        XWPFRun run = paragraph.createRun();
+        run.setText(text);
+        run.setFontSize(15);
+        run.setItalic(true);
+
+        if (bgColor != null) {
+            cell.setColor(bgColor);
+        }
+
+        mergeCellsHorizontal(row, 0, 2);
     }
 
     // Helper function to merge cells horizontally
@@ -146,15 +187,12 @@ public class ExportService {
         for (int colIndex = startCol; colIndex <= endCol; colIndex++) {
             XWPFTableCell cell = row.getCell(colIndex);
             if (colIndex == startCol) {
-                // Set the first cell in the merge region to start the merge
                 cell.getCTTc().addNewTcPr().addNewHMerge().setVal(STMerge.RESTART);
             } else {
-                // Set other cells to continue the merge
                 cell.getCTTc().addNewTcPr().addNewHMerge().setVal(STMerge.CONTINUE);
             }
         }
     }
-
 
     public byte[] exportXlsx(final LocalDate start, final LocalDate end, final UUID profileId) {
 

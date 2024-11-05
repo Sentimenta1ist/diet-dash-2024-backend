@@ -97,9 +97,9 @@ public class RationController {
             @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
         // Create HTTP response with Excel content
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=rations.xlsx");
-        headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        return new ResponseEntity<>(exportService.exportXlsx(start, end, profileId), headers, HttpStatus.OK);
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Rations.docx");
+        headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        return new ResponseEntity<>(exportService.exportDoc(start, end, profileId), headers, HttpStatus.OK);
     }
 
 }

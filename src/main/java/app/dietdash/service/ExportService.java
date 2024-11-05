@@ -125,7 +125,7 @@ public class ExportService {
     }
 
     private static void formatHeaderCell(XWPFTableCell cell, String text, String bgColor, String textColor) {
-        XWPFParagraph paragraph = cell.getParagraphs().get(0);
+        XWPFParagraph paragraph = cell.getParagraphs().getFirst();
         paragraph.setAlignment(ParagraphAlignment.CENTER);
 
 

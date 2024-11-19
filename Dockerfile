@@ -17,9 +17,11 @@ FROM openjdk:21
 # Copy the JAR file from the build stage
 COPY --from=build /app/target/*SNAPSHOT.jar /opt/service.jar
 
-# Expose service ports
-EXPOSE 5005
-EXPOSE 8080
+# Copy the keystore file into the container
+COPY src/main/resources/keystore.p12 /app/keystore.p12
+
+# Expose the port your app will run on (e.g., 8443 for HTTPS)
+EXPOSE 8443
 
 # Set the entry point
 ENTRYPOINT ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar", "/opt/service.jar"]

@@ -29,7 +29,7 @@ services:
       - SERVER_SSL_KEY_STORE=/etc/ssl/certs/keystore.p12
       - SERVER_SSL_KEY_STORE_PASSWORD=password
       - SERVER_SSL_KEY_STORE_TYPE=PKCS12
-      - SERVER_SSL_KEY_ALIAS=1
+      - SERVER_SSL_KEY_ALIAS=tomcat
       - SERVER_PORT=8443
     depends_on:
       postgres:
@@ -37,7 +37,7 @@ services:
     ports:
       - "443:8443"  # Exposing port 443 on host machine to 8443 on the container
     volumes:
-      - ./src/main/resources/keystore.p12:/etc/ssl/certs/keystore.p12  # Mount the keystore file
+      - /etc/letsencrypt/live/api.diet-dash.com/keystore.p12:/etc/ssl/certs/keystore.p12  # Mount the keystore file
     networks:
       - my_network
 

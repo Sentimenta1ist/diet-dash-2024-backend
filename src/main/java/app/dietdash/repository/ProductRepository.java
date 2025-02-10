@@ -1,16 +1,15 @@
 package app.dietdash.repository;
 
 import app.dietdash.model.Product;
-import app.dietdash.model.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.UUID;
-
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
-    Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    Page<Product> findByNameContainingIgnoreCaseAndLang(String name, String lang, Pageable pageable);
+
+    Page<Product> findByLang(String lang, Pageable pageable);
 }

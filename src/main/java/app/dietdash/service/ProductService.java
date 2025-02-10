@@ -24,13 +24,12 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final UtilService utilService;
 
-    public Page<Product> getProductsPage(final String term, final Pageable pageable) {
+    public Page<Product> getProductsPage(final String term, final String lang, final Pageable pageable) {
         if (term == null) {
-            return productRepository.findAll(pageable);
+            return productRepository.findByLang(lang, pageable);
         } else {
-            return productRepository.findByNameContainingIgnoreCase(term, pageable);
+            return productRepository.findByNameContainingIgnoreCaseAndLang(term, lang, pageable);
         }
-
     }
 
     public void fill() {
@@ -54,7 +53,7 @@ public class ProductService {
                 float carbs = Float.parseFloat(values[4].trim());
 
                 // Create a new Product object
-                Product product = new Product(null, name, calories, proteins, fats, carbs, null);
+                Product product = new Product(null, name, calories, proteins, fats, carbs, "ua", null);
 
                 // Add the Product to the list
                 productRepository.save(product);

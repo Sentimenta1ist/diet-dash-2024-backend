@@ -26,13 +26,14 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<Page<Product>> getAllProducts(@RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "100") int size,
+                                                        @RequestParam(defaultValue = "ua") String lang,
                                                         @RequestParam(required = false) String term) {
         final Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(productService.getProductsPage(term, pageable));
+        return ResponseEntity.ok(productService.getProductsPage(term, lang, pageable));
     }
 
     @PostMapping
-    public ResponseEntity<String> addProduct(@RequestBody Product product,  @AuthenticationPrincipal UserDto principal) {
+    public ResponseEntity<String> addProduct(@RequestBody Product product, @AuthenticationPrincipal UserDto principal) {
         productService.createProduct(product, principal);
         return ResponseEntity.ok("Product added");
     }

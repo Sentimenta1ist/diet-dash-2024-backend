@@ -33,6 +33,7 @@ public class Product {
     private float proteins;
     private float fats;
     private float carbs;
+    private String lang;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

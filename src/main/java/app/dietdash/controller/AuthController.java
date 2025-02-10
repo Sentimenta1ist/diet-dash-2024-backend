@@ -63,4 +63,9 @@ public class AuthController {
         userService.confirmUser(token);
         return ResponseEntity.ok("Ok");
     }
+
+    @PostMapping("/checkNew")
+    public ResponseEntity<String> checkNew() {
+        return ResponseEntity.ok("Check new");
+    }
 }

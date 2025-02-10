@@ -18,7 +18,7 @@ FROM openjdk:21
 COPY --from=build /app/target/*SNAPSHOT.jar /opt/service.jar
 
 # Copy the keystore file into the container
-COPY /etc/letsencrypt/live/api.diet-dash.com/keystore.p12 /app/keystore.p12
+COPY src/main/resources/keystore.p12 /app/keystore.p12
 
 # Expose the port your app will run on (e.g., 8443 for HTTPS)
 EXPOSE 8443

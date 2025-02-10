@@ -37,7 +37,7 @@ services:
     ports:
       - "443:8443"  # Exposing port 443 on host machine to 8443 on the container
     volumes:
-      - /etc/letsencrypt/live/api.diet-dash.com/keystore.p12:/etc/ssl/certs/keystore.p12  # Mount the keystore file
+      - ./src/main/resources/keystore.p12:/etc/ssl/certs/keystore.p12  # Mount the keystore file
     networks:
       - my_network
 

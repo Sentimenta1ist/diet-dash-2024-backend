@@ -1,5 +1,7 @@
 package app.dietdash.service;
 
+import app.dietdash.dto.MealWithNameDto;
+import app.dietdash.dto.RationDto;
 import app.dietdash.model.Meal;
 import app.dietdash.model.Ration;
 import exceptions.AppException;
@@ -41,6 +43,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -322,5 +325,34 @@ public class ExportService {
             case SATURDAY -> "Субота";
             case SUNDAY -> "Неділя";
         };
+    }
+
+    public List<RationDto> getRationsForCurrentProfile(final LocalDate start, final LocalDate end, final UUID profileId) {
+        if (start.isAfter(end)) {
+            throw new AppException("startDate should be before or equal to endDate", HttpStatus.BAD_REQUEST);
+        }
+
+        return start.datesUntil(end.plusDays(1)) // Generate a stream of dates from start to end (inclusive)
+                .map(date -> buildRationDtoForDate(profileId, date))
+                .filter(Objects::nonNull) // Filter out nulls if no rations exist for that date
+                .toList();
+    }
+
+    private RationDto buildRationDtoForDate(UUID profileId, LocalDate date) {
+        Ration ration = rationService.getRationByProfileAndDate(profileId, date);
+        if (ration == null || ration.getMeals().isEmpty()) {
+            return null;
+        }
+
+        List<MealWithNameDto> sortedMealDtos = ration.getMeals().stream()
+                .sorted(Comparator.comparing(Meal::getTime))
+                .map(this::convertToMealWithNameDto)
+                .toList();
+
+        return sortedMealDtos.isEmpty() ? null : new RationDto(date, sortedMealDtos);
+    }
+
+    private MealWithNameDto convertToMealWithNameDto(Meal meal) {
+        return new MealWithNameDto(meal.getTime(), meal.getGrams(), meal.getProduct().getName());
     }
 }

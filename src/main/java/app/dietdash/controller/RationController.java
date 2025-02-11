@@ -2,6 +2,7 @@ package app.dietdash.controller;
 
 import app.dietdash.dto.LocalDatesDto;
 import app.dietdash.dto.MealDto;
+import app.dietdash.dto.RationDto;
 import app.dietdash.model.Ration;
 import app.dietdash.service.ExportService;
 import app.dietdash.service.RationService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -101,6 +103,13 @@ public class RationController {
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Rations.docx");
         headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         return new ResponseEntity<>(exportService.exportDoc(start, end, profileId), headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/public")
+    public ResponseEntity<List<RationDto>> publicRation(@RequestParam("profileId") UUID profileId,
+                                                        @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+                                                        @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+        return new ResponseEntity<>(exportService.getRationsForCurrentProfile(start, end, profileId), HttpStatus.OK);
     }
 
 }

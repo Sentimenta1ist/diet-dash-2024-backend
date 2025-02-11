@@ -11,6 +11,9 @@ import app.dietdash.repository.ProfileRepository;
 import app.dietdash.service.mapper.UserMapper;
 import exceptions.AppException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,12 +41,19 @@ public class ProfileService {
                 .toList();
     }
 
-    public List<ProfileDto> getProfileList(final String term, final UserDto principal) {
-        return utilService.getUserFromPrincipal(principal).getProfileList()
+    public Page<ProfileDto> getProfileList(final String term, final UserDto principal, final Pageable pageable) {
+        List<ProfileDto> filteredProfiles = utilService.getUserFromPrincipal(principal).getProfileList()
                 .stream()
                 .filter(x -> term == null || x.getName().toLowerCase().contains(term.toLowerCase()))
                 .map(mapper::toProfileDto)
                 .toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), filteredProfiles.size());
+
+        List<ProfileDto> pagedList = (start > filteredProfiles.size()) ? List.of() : filteredProfiles.subList(start, end);
+
+        return new PageImpl<>(pagedList, pageable, filteredProfiles.size());
     }
 
     public Profile getProfileById(final UUID id) {

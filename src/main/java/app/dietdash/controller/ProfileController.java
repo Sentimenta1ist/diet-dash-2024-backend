@@ -7,6 +7,9 @@ import app.dietdash.dto.UserDto;
 import app.dietdash.model.Profile;
 import app.dietdash.service.ProfileService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,9 +39,12 @@ public class ProfileController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<ProfileDto>> getProfileList(@RequestParam(required = false) String term,
+    public ResponseEntity<Page<ProfileDto>> getProfileList(@RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size,
+                                                           @RequestParam(required = false) String term,
                                                            @AuthenticationPrincipal UserDto principal) {
-        return ResponseEntity.ok(profileService.getProfileList(term, principal));
+        final Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(profileService.getProfileList(term, principal, pageable));
     }
 
     @GetMapping("/{id}")

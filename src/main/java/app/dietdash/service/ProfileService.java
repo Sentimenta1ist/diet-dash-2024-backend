@@ -1,6 +1,7 @@
 package app.dietdash.service;
 
 import app.dietdash.dto.ActivityDto;
+import app.dietdash.dto.ProfileDto;
 import app.dietdash.dto.ProfileNameDto;
 import app.dietdash.dto.UserDto;
 import app.dietdash.enums.Activity;
@@ -30,6 +31,14 @@ public class ProfileService {
     }
 
     public List<ProfileNameDto> getAllProfiles(final String term, final UserDto principal) {
+        return utilService.getUserFromPrincipal(principal).getProfileList()
+                .stream()
+                .filter(x -> term == null || x.getName().toLowerCase().contains(term.toLowerCase()))
+                .map(mapper::toProfileNameDto)
+                .toList();
+    }
+
+    public List<ProfileDto> getProfileList(final String term, final UserDto principal) {
         return utilService.getUserFromPrincipal(principal).getProfileList()
                 .stream()
                 .filter(x -> term == null || x.getName().toLowerCase().contains(term.toLowerCase()))

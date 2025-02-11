@@ -1,6 +1,7 @@
 package app.dietdash.service.mapper;
 
 import app.dietdash.dto.ActivityDto;
+import app.dietdash.dto.ProfileDto;
 import app.dietdash.dto.ProfileNameDto;
 import app.dietdash.dto.SignUpDto;
 import app.dietdash.dto.UserDto;
@@ -18,7 +19,9 @@ public interface UserMapper {
     @Mapping(target = "password", ignore = true)
     User signUpToUser(SignUpDto signUpDto);
 
-    ProfileNameDto toProfileDto(Profile profile);
+    ProfileNameDto toProfileNameDto(Profile profile);
+
+    ProfileDto toProfileDto(Profile profile);
 
     ActivityDto toActivityDto(Activity activity);
 }

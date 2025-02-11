@@ -1,6 +1,7 @@
 package app.dietdash.controller;
 
 import app.dietdash.dto.ActivityDto;
+import app.dietdash.dto.ProfileDto;
 import app.dietdash.dto.ProfileNameDto;
 import app.dietdash.dto.UserDto;
 import app.dietdash.model.Profile;
@@ -32,6 +33,12 @@ public class ProfileController {
     public ResponseEntity<List<ProfileNameDto>> getAllProfiles(@RequestParam(required = false) String term,
                                                                @AuthenticationPrincipal UserDto principal) {
         return ResponseEntity.ok(profileService.getAllProfiles(term, principal));
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<ProfileDto>> getProfileList(@RequestParam(required = false) String term,
+                                                           @AuthenticationPrincipal UserDto principal) {
+        return ResponseEntity.ok(profileService.getProfileList(term, principal));
     }
 
     @GetMapping("/{id}")

@@ -18,8 +18,6 @@ import java.time.LocalTime;
 public class MealWithNameDto {
     @JsonFormat(pattern = "HH:mm")
     LocalTime time;
-
     int grams;
-
     String productName;
 }

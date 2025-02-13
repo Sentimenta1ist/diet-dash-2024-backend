@@ -29,6 +29,9 @@ public class ProductController {
                                                         @RequestParam(defaultValue = "ua") String lang,
                                                         @RequestParam(required = false) String term) {
         final Pageable pageable = PageRequest.of(page, size);
+        if (lang.equals("uk")) {
+            lang = "ua";
+        }
         return ResponseEntity.ok(productService.getProductsPage(term, lang, pageable));
     }
 

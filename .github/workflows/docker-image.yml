@@ -27,4 +27,4 @@ jobs:
           context: .
           push: true
           tags: |
-            sentimentaly/diet-dash-images:latest
+            sentimentaly/diet-dash-backend:latest

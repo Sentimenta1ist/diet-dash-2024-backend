@@ -29,7 +29,6 @@ import java.util.UUID;
 public class Profile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @JsonIgnore
     private UUID id;
 

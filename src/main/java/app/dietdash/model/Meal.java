@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+
 import java.time.LocalTime;
 
 @Getter
@@ -27,9 +28,10 @@ import java.time.LocalTime;
 @Entity
 @Table(name = "meal")
 public class Meal {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
     @JsonFormat(pattern = "HH:mm")
     LocalTime time;

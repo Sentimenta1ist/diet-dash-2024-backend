@@ -1,0 +1,2 @@
+postgres-uri: "jdbc:postgresql://postgres:5432/diet-dash"
+port: 5000

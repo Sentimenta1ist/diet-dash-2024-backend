@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - includeAll:
+      path: db/changelog/changes/
+      resourceComparator: "app.dietdash.config.LiquibaseChangelogComparator"

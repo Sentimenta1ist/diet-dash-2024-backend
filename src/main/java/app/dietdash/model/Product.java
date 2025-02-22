@@ -15,6 +15,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 
+
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -25,8 +27,8 @@ import lombok.ToString;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;
     private float calories;

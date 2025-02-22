@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: diet-dash
+
+  datasource:
+    url: ${postgres-uri}
+    username: user
+    password: password
+
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        default_schema: ${spring.liquibase.default-schema}
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc.batch_size: 64
+        order_updates: true
+        order_inserts: true
+    hibernate:
+      ddl-auto: validate
+
+  mustache:
+    servlet:
+      expose-request-attributes: true
+
+  liquibase:
+    liquibase-schema: public
+    parameters:
+      schema: ${spring.liquibase.default-schema}
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: diet.dash.agent@gmail.com
+    password: ***REMOVED***
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  port: ${port}
+
+logging:
+  level:
+    org.springframework.security: DEBUG

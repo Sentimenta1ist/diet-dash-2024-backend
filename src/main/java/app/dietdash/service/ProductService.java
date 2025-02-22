@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import java.util.Objects;
 
 @Service
@@ -84,7 +85,7 @@ public class ProductService {
     }
 
     @Transactional
-    public void deleteProductById(Integer id) {
+    public void deleteProductById(Long id) {
         productRepository.deleteById(id);
     }
 
@@ -93,7 +94,7 @@ public class ProductService {
         productRepository.deleteAll();
     }
 
-    public Product getProductById(int productId) {
+    public Product getProductById(Long productId) {
         return productRepository.findById(productId).orElse(null);
     }
 }

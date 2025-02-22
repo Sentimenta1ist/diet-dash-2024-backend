@@ -219,24 +219,24 @@ class DietDashApplicationTests {
         Ration ration = new Ration();
         List<Meal> meals = new ArrayList<>();
 
-        meals.add(new Meal(0, LocalTime.of(12, 10), 100, createMockProduct("Toмат"), ration));
-        meals.add(new Meal(0, LocalTime.of(12, 10), 100, createMockProduct("Банан"), ration));
-        meals.add(new Meal(0, LocalTime.of(12, 10), 100, createMockProduct("Банан"), ration));
-        meals.add(new Meal(0, LocalTime.of(12, 10), 100, createMockProduct("Банан"), ration));
-        meals.add(new Meal(0, LocalTime.of(12, 10), 100, createMockProduct("ТоматоБанан"), ration));
-        meals.add(new Meal(0, LocalTime.of(12, 10), 100, createMockProduct("ТоматоБанан"), ration));
-        meals.add(new Meal(0, LocalTime.of(12, 10), 100, createMockProduct("ТоматоБанан"), ration));
-        meals.add(new Meal(0, LocalTime.of(12, 10), 100, createMockProduct("ТоматоБанан"), ration));
-        meals.add(new Meal(0, LocalTime.of(13, 15), 150, createMockProduct("Банан"), ration));
-        meals.add(new Meal(0, LocalTime.of(13, 15), 150, createMockProduct("Банан"), ration));
-        meals.add(new Meal(0, LocalTime.of(13, 15), 150, createMockProduct("Банан"), ration));
-        meals.add(new Meal(0, LocalTime.of(13, 15), 150, createMockProduct("Банан"), ration));
-        meals.add(new Meal(0, LocalTime.of(13, 15), 150, createMockProduct("Банан"), ration));
-        meals.add(new Meal(0, LocalTime.of(13, 15), 150, createMockProduct("Банан"), ration));
-        meals.add(new Meal(0, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
-        meals.add(new Meal(0, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
-        meals.add(new Meal(0, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
-        meals.add(new Meal(0, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
+        meals.add(new Meal(0L, LocalTime.of(12, 10), 100, createMockProduct("Toмат"), ration));
+        meals.add(new Meal(0L, LocalTime.of(12, 10), 100, createMockProduct("Банан"), ration));
+        meals.add(new Meal(0L, LocalTime.of(12, 10), 100, createMockProduct("Банан"), ration));
+        meals.add(new Meal(0L, LocalTime.of(12, 10), 100, createMockProduct("Банан"), ration));
+        meals.add(new Meal(0L, LocalTime.of(12, 10), 100, createMockProduct("ТоматоБанан"), ration));
+        meals.add(new Meal(0L, LocalTime.of(12, 10), 100, createMockProduct("ТоматоБанан"), ration));
+        meals.add(new Meal(0L, LocalTime.of(12, 10), 100, createMockProduct("ТоматоБанан"), ration));
+        meals.add(new Meal(0L, LocalTime.of(12, 10), 100, createMockProduct("ТоматоБанан"), ration));
+        meals.add(new Meal(0L, LocalTime.of(13, 15), 150, createMockProduct("Банан"), ration));
+        meals.add(new Meal(0L, LocalTime.of(13, 15), 150, createMockProduct("Банан"), ration));
+        meals.add(new Meal(0L, LocalTime.of(13, 15), 150, createMockProduct("Банан"), ration));
+        meals.add(new Meal(0L, LocalTime.of(13, 15), 150, createMockProduct("Банан"), ration));
+        meals.add(new Meal(0L, LocalTime.of(13, 15), 150, createMockProduct("Банан"), ration));
+        meals.add(new Meal(0L, LocalTime.of(13, 15), 150, createMockProduct("Банан"), ration));
+        meals.add(new Meal(0L, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
+        meals.add(new Meal(0L, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
+        meals.add(new Meal(0L, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
+        meals.add(new Meal(0L, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
 
         ration.setMeals(meals);
         ration.setDate(LocalDate.of(2024, 5, 6));
@@ -247,22 +247,22 @@ class DietDashApplicationTests {
         Ration ration = new Ration();
         List<Meal> meals = new ArrayList<>();
 
-        meals.add(new Meal(0, LocalTime.of(12, 10), 100, createMockProduct("Toматна паста"), ration));
-        meals.add(new Meal(0, LocalTime.of(12, 10), 100, createMockProduct("Toматна паста"), ration));
-        meals.add(new Meal(0, LocalTime.of(12, 10), 100, createMockProduct("Toматна паста"), ration));
-        meals.add(new Meal(0, LocalTime.of(12, 10), 100, createMockProduct("Toматна паста"), ration));
-        meals.add(new Meal(0, LocalTime.of(12, 10), 100, createMockProduct("Toматна паста"), ration));
-        meals.add(new Meal(0, LocalTime.of(13, 15), 150, createMockProduct("Бананове пюре"), ration));
-        meals.add(new Meal(0, LocalTime.of(13, 15), 150, createMockProduct("Бананове пюре"), ration));
-        meals.add(new Meal(0, LocalTime.of(13, 15), 150, createMockProduct("Бананове пюре"), ration));
-        meals.add(new Meal(0, LocalTime.of(13, 15), 150, createMockProduct("Бананове пюре"), ration));
-        meals.add(new Meal(0, LocalTime.of(13, 15), 150, createMockProduct("Бананове пюре"), ration));
-        meals.add(new Meal(0, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
-        meals.add(new Meal(0, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
-        meals.add(new Meal(0, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
-        meals.add(new Meal(0, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
-        meals.add(new Meal(0, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
-        meals.add(new Meal(0, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
+        meals.add(new Meal(0L, LocalTime.of(12, 10), 100, createMockProduct("Toматна паста"), ration));
+        meals.add(new Meal(0L, LocalTime.of(12, 10), 100, createMockProduct("Toматна паста"), ration));
+        meals.add(new Meal(0L, LocalTime.of(12, 10), 100, createMockProduct("Toматна паста"), ration));
+        meals.add(new Meal(0L, LocalTime.of(12, 10), 100, createMockProduct("Toматна паста"), ration));
+        meals.add(new Meal(0L, LocalTime.of(12, 10), 100, createMockProduct("Toматна паста"), ration));
+        meals.add(new Meal(0L, LocalTime.of(13, 15), 150, createMockProduct("Бананове пюре"), ration));
+        meals.add(new Meal(0L, LocalTime.of(13, 15), 150, createMockProduct("Бананове пюре"), ration));
+        meals.add(new Meal(0L, LocalTime.of(13, 15), 150, createMockProduct("Бананове пюре"), ration));
+        meals.add(new Meal(0L, LocalTime.of(13, 15), 150, createMockProduct("Бананове пюре"), ration));
+        meals.add(new Meal(0L, LocalTime.of(13, 15), 150, createMockProduct("Бананове пюре"), ration));
+        meals.add(new Meal(0L, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
+        meals.add(new Meal(0L, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
+        meals.add(new Meal(0L, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
+        meals.add(new Meal(0L, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
+        meals.add(new Meal(0L, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
+        meals.add(new Meal(0L, LocalTime.of(20, 30), 160, createMockProduct("Лапша зі смаком"), ration));
 
         ration.setMeals(meals);
         ration.setDate(LocalDate.of(2024, 5, 7));
@@ -271,7 +271,7 @@ class DietDashApplicationTests {
 
 
     private Product createMockProduct(String name) {
-        return new Product(0, name, 0.0f, 0.0f, 0.0f, 0.0f, "ua", null);
+        return new Product(0L, name, 0.0f, 0.0f, 0.0f, 0.0f, "ua", null);
     }
 }
 

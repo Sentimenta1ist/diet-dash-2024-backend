@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @Repository
-public interface RationRepository extends JpaRepository<Ration, Integer> {
+public interface RationRepository extends JpaRepository<Ration, Long> {
 
     Optional<Ration> findByProfileAndDate(Profile profile, LocalDate date);
 }

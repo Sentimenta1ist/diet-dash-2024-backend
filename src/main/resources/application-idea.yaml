@@ -1,0 +1,2 @@
+postgres-uri: "jdbc:postgresql://localhost:5432/diet-dash"
+port: 8080

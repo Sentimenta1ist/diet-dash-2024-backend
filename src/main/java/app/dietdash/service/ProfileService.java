@@ -64,6 +64,8 @@ public class ProfileService {
     public UUID addProfile(final Profile profile, final UserDto principal) {
         final User user = utilService.getUserFromPrincipal(principal);
 
+        profile.setId(UUID.randomUUID());
+        profile.setUser(user);
         Profile entity = profileRepository.save(profile);
         user.addProfile(entity);
 

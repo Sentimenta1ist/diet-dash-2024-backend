@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,14 +88,14 @@ public class RationService {
     }
 
     @Transactional
-    public void deleteMeal(final Integer mealId) {
+    public void deleteMeal(final Long mealId) {
         Meal meal = mealRepository.findById(mealId)
                 .orElseThrow(() -> new AppException("Unknown meal with id: " + mealId, HttpStatus.NOT_FOUND));
         mealRepository.delete(meal);
     }
 
     @Transactional
-    public void updateMeal(final Integer mealId, final MealDto updateMeal) {
+    public void updateMeal(final Long mealId, final MealDto updateMeal) {
         Meal meal = mealRepository.findById(mealId)
                 .orElseThrow(() -> new AppException("Unknown profile with id: " + mealId, HttpStatus.NOT_FOUND));
 

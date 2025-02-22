@@ -37,7 +37,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
-import java.math.BigInteger;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -67,7 +67,7 @@ public class ExportService {
             CTTbl tableCT = table.getCTTbl();
             CTTblPr tblPr = tableCT.getTblPr() == null ? tableCT.addNewTblPr() : tableCT.getTblPr();
             tblPr.addNewTblW().setType(STTblWidth.DXA);
-            tblPr.getTblW().setW(BigInteger.valueOf(10000));
+            tblPr.getTblW().setW(Long.valueOf(10000));
 
             // Add header row
             XWPFTableRow headerRow = table.getRow(0); // The first row is created by default
@@ -115,14 +115,14 @@ public class ExportService {
 
     public static void setRowMinHeight(XWPFTableRow row, int height) {
         CTTrPr trPr = row.getCtRow().addNewTrPr();
-        trPr.addNewTrHeight().setVal(BigInteger.valueOf(height));
+        trPr.addNewTrHeight().setVal(Long.valueOf(height));
         trPr.getTrHeightArray(0).setHRule(STHeightRule.EXACT);
     }
 
     private static void setColumnWidth(XWPFTableCell cell, int width) {
         CTTcPr tcPr = cell.getCTTc().addNewTcPr();
         CTTblWidth cellWidth = tcPr.addNewTcW();
-        cellWidth.setW(BigInteger.valueOf(width));
+        cellWidth.setW(Long.valueOf(width));
     }
 
     private static void formatHeaderCell(XWPFTableCell cell, String text, String bgColor, String textColor) {

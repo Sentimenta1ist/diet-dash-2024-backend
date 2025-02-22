@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -51,14 +52,14 @@ public class RationController {
 
     @DeleteMapping("/delete/{mealId}")
     public ResponseEntity<String> deleteMeal(
-            @PathVariable Integer mealId) {
+            @PathVariable Long mealId) {
         rationService.deleteMeal(mealId);
         return ResponseEntity.ok("Deleted");
     }
 
     @PutMapping("/update/{mealId}")
     public ResponseEntity<String> updateMeal(
-            @PathVariable Integer mealId,
+            @PathVariable Long mealId,
             @RequestBody MealDto meal) {
 
         rationService.updateMeal(mealId, meal);

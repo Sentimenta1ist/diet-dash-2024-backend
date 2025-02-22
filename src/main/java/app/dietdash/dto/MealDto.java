@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 import java.time.LocalTime;
 
 @Getter
@@ -20,5 +21,5 @@ public class MealDto {
 
     int grams;
 
-    Integer productId;
+    Long productId;
 }

@@ -47,6 +47,6 @@ jobs:
             key: ${{ secrets.SSH_PRIVATE_KEY }}
             debug: true
             script: |
-              cd /home/ubuntu/diet-dash  # Укажи правильный путь к docker-compose.yml
+              cd diet-dash-config
               docker-compose pull
               docker-compose up -d

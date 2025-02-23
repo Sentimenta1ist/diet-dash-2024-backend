@@ -271,7 +271,7 @@ class DietDashApplicationTests {
 
 
     private Product createMockProduct(String name) {
-        return new Product(0L, name, 0.0f, 0.0f, 0.0f, 0.0f, "ua", null);
+        return new Product(0L, name, 0.0f, 0.0f, 0.0f, 0.0f, null);
     }
 }
 

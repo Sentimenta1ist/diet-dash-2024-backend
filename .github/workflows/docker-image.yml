@@ -47,6 +47,10 @@ jobs:
             key: ${{ secrets.SSH_PRIVATE_KEY }}
             debug: true
             script: |
-              cd diet-dash-config
+              cd /root/diet-dash-config
+              echo "Docker Compose version: $(docker-compose --version)"
+              docker-compose down backend
+              docker image rm sentimentaly/diet-dash-backend:latest || true
               docker-compose pull
               docker-compose up -d
+              docker ps -a

@@ -15,8 +15,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 
-
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -29,13 +27,11 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     private float calories;
     private float proteins;
     private float fats;
     private float carbs;
-    private String lang;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

@@ -200,3 +200,10 @@ databaseChangeLog:
                     nullable: false
                     foreignKeyName: fk_meal_ration
                     references: ration(id)
+  - changeSet:
+      id: "20250223-1"
+      author: diet-dash-dev
+      changes:
+        - dropColumn:
+            tableName: product
+            columnName: lang

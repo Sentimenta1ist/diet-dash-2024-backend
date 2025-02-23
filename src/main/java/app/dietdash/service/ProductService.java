@@ -17,7 +17,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import java.util.Objects;
 
 @Service
@@ -28,9 +27,9 @@ public class ProductService {
 
     public Page<Product> getProductsPage(final String term, final String lang, final Pageable pageable) {
         if (term == null) {
-            return productRepository.findByLang(lang, pageable);
+            return productRepository.findAll(pageable);
         } else {
-            return productRepository.findByNameContainingIgnoreCaseAndLang(term, lang, pageable);
+            return productRepository.findByNameContainingIgnoreCase(term, pageable);
         }
     }
 
@@ -56,7 +55,7 @@ public class ProductService {
                 float carbs = Float.parseFloat(values[4].trim());
 
                 // Create a new Product object
-                Product product = new Product(null, name, calories, proteins, fats, carbs, "ua", null);
+                Product product = new Product(null, name, calories, proteins, fats, carbs, null);
 
                 // Add the Product to the list
                 productRepository.save(product);

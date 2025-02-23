@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.init.ResourceReader;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,7 @@ public class ProductService {
         }
     }
 
+    @Async
     public void fill() {
 
         try (InputStream inputStream = ResourceReader.class.getClassLoader().getResourceAsStream("utils/file.csv");

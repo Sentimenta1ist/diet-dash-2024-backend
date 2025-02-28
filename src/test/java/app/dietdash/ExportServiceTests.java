@@ -30,10 +30,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-class DietDashApplicationTests {
+class ExportServiceTests {
 
     @Test
-    public void test() throws IOException {
+    public void exportTest() throws IOException {
 
         // Create a new Word document
         XWPFDocument document = new XWPFDocument();
@@ -271,7 +271,7 @@ class DietDashApplicationTests {
 
 
     private Product createMockProduct(String name) {
-        return new Product(0L, name, 0.0f, 0.0f, 0.0f, 0.0f, null);
+        return new Product(0L, name, name, 0.0f, 0.0f, 0.0f, 0.0f, null);
     }
 }
 

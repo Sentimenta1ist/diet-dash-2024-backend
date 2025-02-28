@@ -1,6 +1,7 @@
 package app.dietdash.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import app.dietdash.service.UserSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,6 +29,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String engName;
     private float calories;
     private float proteins;
     private float fats;
@@ -35,6 +37,6 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnore
+    @JsonSerialize(using = UserSerializer.class)
     private User user;
 }

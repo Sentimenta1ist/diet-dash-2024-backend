@@ -37,7 +37,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -67,7 +66,7 @@ public class ExportService {
             CTTbl tableCT = table.getCTTbl();
             CTTblPr tblPr = tableCT.getTblPr() == null ? tableCT.addNewTblPr() : tableCT.getTblPr();
             tblPr.addNewTblW().setType(STTblWidth.DXA);
-            tblPr.getTblW().setW(Long.valueOf(10000));
+            tblPr.getTblW().setW(10000L);
 
             // Add header row
             XWPFTableRow headerRow = table.getRow(0); // The first row is created by default
@@ -107,7 +106,6 @@ public class ExportService {
             return out.toByteArray();
 
         } catch (Exception e) {
-            System.out.println(e);
             throw new AppException("Error during the export.", HttpStatus.BAD_REQUEST);
         }
     }
@@ -115,14 +113,14 @@ public class ExportService {
 
     public static void setRowMinHeight(XWPFTableRow row, int height) {
         CTTrPr trPr = row.getCtRow().addNewTrPr();
-        trPr.addNewTrHeight().setVal(Long.valueOf(height));
+        trPr.addNewTrHeight().setVal((long) height);
         trPr.getTrHeightArray(0).setHRule(STHeightRule.EXACT);
     }
 
     private static void setColumnWidth(XWPFTableCell cell, int width) {
         CTTcPr tcPr = cell.getCTTc().addNewTcPr();
         CTTblWidth cellWidth = tcPr.addNewTcW();
-        cellWidth.setW(Long.valueOf(width));
+        cellWidth.setW((long) width);
     }
 
     private static void formatHeaderCell(XWPFTableCell cell, String text, String bgColor, String textColor) {
@@ -152,7 +150,7 @@ public class ExportService {
     }
 
     private static void setTableCellText(XWPFTableCell cell, String text, ParagraphAlignment alignment) {
-        XWPFParagraph paragraph = cell.getParagraphs().get(0);
+        XWPFParagraph paragraph = cell.getParagraphs().getFirst();
         paragraph.setAlignment(alignment);
 
         XWPFRun run = paragraph.createRun();
@@ -168,7 +166,7 @@ public class ExportService {
 
         XWPFTableCell cell = row.getCell(0);
 
-        XWPFParagraph paragraph = cell.getParagraphs().get(0);
+        XWPFParagraph paragraph = cell.getParagraphs().getFirst();
         paragraph.setAlignment(ParagraphAlignment.CENTER);
 
         XWPFRun run = paragraph.createRun();

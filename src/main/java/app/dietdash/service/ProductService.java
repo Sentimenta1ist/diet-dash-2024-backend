@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.init.ResourceReader;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +16,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @AllArgsConstructor
@@ -25,52 +27,104 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final UtilService utilService;
 
-    public Page<Product> getProductsPage(final String term, final String lang, final Pageable pageable) {
-        if (term == null) {
-            return productRepository.findAll(pageable);
+    public Page<Product> getProductsPage(final String term, final String lang, final UserDto user, final Pageable pageable) {
+        Objects.requireNonNull(user, "User cannot be null");
+        Objects.requireNonNull(pageable, "Pageable cannot be null");
+
+        if (term == null || term.trim().isEmpty()) {
+            return productRepository.findByUserIdIsNullOrUserId(user.getId(), pageable);
+        }
+
+        return "en".equalsIgnoreCase(lang) ?
+                productRepository.findByUserIdIsNullOrUserId(user.getId(), pageable) :
+                productRepository.findByNameContainingIgnoreCaseAndUserIdIsNullOrUserId(term, user.getId(), pageable);
+    }
+
+    public Page<Product> getProductBasePage(final String lang, final String term, final Pageable pageable) {
+        Objects.requireNonNull(pageable, "Pageable cannot be null");
+        if (term == null || term.trim().isEmpty()) {
+            return productRepository.findByUserIdIsNull(pageable);
+        }
+        return "en".equalsIgnoreCase(lang) ?
+                productRepository.findByEngNameContainingIgnoreCaseAndUserIdIsNull(term, pageable) :
+                productRepository.findByNameContainingIgnoreCaseAndUserIdIsNull(term, pageable);
+    }
+
+    public Page<Product> getProductCreatedPage(final String term, final UserDto user, final Pageable pageable) {
+        Objects.requireNonNull(user, "User cannot be null");
+        Objects.requireNonNull(pageable, "Pageable cannot be null");
+        if (term == null || term.trim().isEmpty()) {
+            return productRepository.findByUserId(user.getId(), pageable);
         } else {
-            return productRepository.findByNameContainingIgnoreCase(term, pageable);
+            return productRepository.findByNameContainingIgnoreCaseAndUserId(term, user.getId(), pageable);
         }
     }
 
     @Async
-    public void fill() {
+    @Transactional
+    public CompletableFuture<Void> fill() {
+        List<Product> products = new ArrayList<>(1000); // Буфер для пакетной записи
 
-        try (InputStream inputStream = ResourceReader.class.getClassLoader().getResourceAsStream("utils/file.csv");
+        try (InputStream inputStream = ProductService.class.getClassLoader().getResourceAsStream("utils/main_data.csv");
              BufferedReader br = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)))) {
 
             String line;
+            int batchSize = 1000; // Размер пакета для сохранения
+            int lineNumber = 0;
+
             while ((line = br.readLine()) != null) {
+                lineNumber++;
+                try {
+                    String[] values = line.split(",", -1); // -1 для обработки пустых полей
 
-                // Split the line by commas
-                String[] values = line.split(",");
+                    if (values.length < 5) {
+                        System.err.println("incorrect lenthgs " + lineNumber + ": " + line);
+                        continue;
+                    }
 
-                // Parse values and create a Product object
-                String name = values[0].trim();
-                name = StringUtils.capitalize(name);
+                    String engName = values[0].trim();
+                    engName = StringUtils.capitalize(engName);
 
-                float calories = Float.parseFloat(values[1].trim());
-                float proteins = Float.parseFloat(values[2].trim());
-                float fats = Float.parseFloat(values[3].trim());
-                float carbs = Float.parseFloat(values[4].trim());
+                    String name = values[1].trim();
+                    name = StringUtils.capitalize(name);
 
-                // Create a new Product object
-                Product product = new Product(null, name, calories, proteins, fats, carbs, null);
+                    float calories = Float.parseFloat(values[2].trim());
+                    float proteins = Float.parseFloat(values[3].trim());
+                    float fats = Float.parseFloat(values[4].trim());
+                    float carbs = Float.parseFloat(values[5].trim());
 
-                // Add the Product to the list
-                productRepository.save(product);
+                    Product product = new Product(null, name, engName, calories, proteins, fats, carbs, null);
+                    products.add(product);
+
+                    // Пакетная запись
+                    if (products.size() >= batchSize) {
+                        productRepository.saveAll(products);
+                        products.clear(); // Очищаем список после сохранения
+                    }
+                } catch (NumberFormatException e) {
+                    System.err.println("Parsing error " + lineNumber + ": " + line + " - " + e.getMessage());
+                }
+            }
+
+            // Сохраняем остаток
+            if (!products.isEmpty()) {
+                productRepository.saveAll(products);
             }
 
         } catch (IOException e) {
-            System.err.println("Error reading the CSV file: " + e.getMessage());
+            System.err.println("Error reading CSV: " + e.getMessage());
+            return CompletableFuture.failedFuture(e);
         }
+
+        return CompletableFuture.completedFuture(null);
     }
 
 
     @Transactional
     public void createProduct(Product product, UserDto principal) {
         final User user = utilService.getUserFromPrincipal(principal);
-        product.setName(product.getName().toLowerCase());
+        product.setName(product.getName());
+        product.setEngName(product.getName());
         Product entity = productRepository.save(product);
         user.addProduct(entity);
     }

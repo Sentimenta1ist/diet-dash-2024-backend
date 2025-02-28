@@ -3,10 +3,10 @@ package app.dietdash.controller;
 import app.dietdash.dto.UserDto;
 import app.dietdash.model.Product;
 import app.dietdash.service.ProductService;
+import app.dietdash.service.UtilService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,22 +17,36 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/products/all")
 @RequiredArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
+    private final UtilService utilService;
 
     @GetMapping
     public ResponseEntity<Page<Product>> getAllProducts(@RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "100") int size,
-                                                        @RequestParam(defaultValue = "ua") String lang,
-                                                        @RequestParam(required = false) String term) {
-        final Pageable pageable = PageRequest.of(page, size);
-        if (lang.equals("uk")) {
-            lang = "ua";
-        }
-        return ResponseEntity.ok(productService.getProductsPage(term, lang, pageable));
+                                                        @RequestParam(defaultValue = "20") int size,
+                                                        @RequestParam(defaultValue = "en") String lang,
+                                                        @RequestParam(required = false) String term,
+                                                        @AuthenticationPrincipal UserDto principal) {
+        return ResponseEntity.ok(productService.getProductsPage(term, lang, principal, PageRequest.of(page, size)));
+    }
+
+    @GetMapping("/created")
+    public ResponseEntity<Page<Product>> getProductsOfUser(@RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "20") int size,
+                                                           @RequestParam(required = false) String term,
+                                                           @AuthenticationPrincipal UserDto principal) {
+        return ResponseEntity.ok(productService.getProductCreatedPage(term, principal, PageRequest.of(page, size)));
+    }
+
+    @GetMapping("/base")
+    public ResponseEntity<Page<Product>> getBaseProducts(@RequestParam(defaultValue = "0") int page,
+                                                         @RequestParam(defaultValue = "20") int size,
+                                                         @RequestParam(defaultValue = "en") String lang,
+                                                         @RequestParam(required = false) String term) {
+        return ResponseEntity.ok(productService.getProductBasePage(lang, term, PageRequest.of(page, size)));
     }
 
     @PostMapping
@@ -43,8 +57,13 @@ public class ProductController {
 
     @PostMapping("/fill")
     public ResponseEntity<String> addProduct() {
-        productService.fill();
-        return ResponseEntity.ok("Filled.");
+        productService.fill()
+                .thenRun(() -> System.out.println("Filled."))
+                .exceptionally(throwable -> {
+                    System.err.println("Error: " + throwable.getMessage());
+                    return null;
+                });
+        return ResponseEntity.accepted().body("Filling started.");
     }
 
 }

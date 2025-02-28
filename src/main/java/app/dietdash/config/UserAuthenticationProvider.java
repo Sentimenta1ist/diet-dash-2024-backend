@@ -56,7 +56,7 @@ public class UserAuthenticationProvider {
 
         UserDto user = userService.findByLogin(decoded.getSubject());
 
-        if(user.isEnabled()) {
+        if (user.isEnabled()) {
             return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
         } else {
             throw new AppException("Email is not activated", HttpStatus.NOT_ACCEPTABLE);

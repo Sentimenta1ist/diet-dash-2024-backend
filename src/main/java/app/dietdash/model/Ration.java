@@ -3,6 +3,7 @@ package app.dietdash.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -40,7 +41,7 @@ public class Ration {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
-    @OneToMany(mappedBy = "ration")
+    @OneToMany(mappedBy = "ration", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Meal> meals = new ArrayList<>();
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

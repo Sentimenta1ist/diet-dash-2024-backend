@@ -59,6 +59,6 @@ public class Profile {
     private User user;
 
     public ActivityDto getActivity() {
-        return new ActivityDto(activity.getId(), activity.getDescription(), activity.getMultiplier());
+        return new ActivityDto(activity.getId(), activity.getDescription(), activity.getEnDescription(), activity.getMultiplier());
     }
 }

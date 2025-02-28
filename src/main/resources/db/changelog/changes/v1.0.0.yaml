@@ -207,3 +207,56 @@ databaseChangeLog:
         - dropColumn:
             tableName: product
             columnName: lang
+  - changeSet:
+      id: "20250224-1"
+      author: diet-dash-dev
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: ration
+            constraintName: fk_ration_profile
+        - addForeignKeyConstraint:
+            baseTableName: ration
+            baseColumnNames: profile_id
+            constraintName: fk_ration_profile
+            referencedTableName: profile
+            referencedColumnNames: id
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+        - dropForeignKeyConstraint:
+            baseTableName: profile
+            constraintName: fk_profile_user
+        - addForeignKeyConstraint:
+            baseTableName: profile
+            baseColumnNames: user_id
+            constraintName: fk_profile_user
+            referencedTableName: app_user
+            referencedColumnNames: id
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+  - changeSet:
+      id: "20250224-2"
+      author: diet-dash-dev
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: product
+            constraintName: fk_product_user
+        - addForeignKeyConstraint:
+            baseTableName: product
+            baseColumnNames: user_id
+            constraintName: fk_product_user
+            referencedTableName: app_user
+            referencedColumnNames: id
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+  - changeSet:
+      id: "20250224-6"
+      author: diet-dash-dev
+      changes:
+        - addColumn:
+            tableName: product
+            columns:
+              - column:
+                  name: eng_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: true

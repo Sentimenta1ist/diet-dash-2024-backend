@@ -10,5 +10,6 @@ import lombok.Data;
 public class ActivityDto {
     int id;
     String description;
+    String enDescription;
     double multiplier;
 }

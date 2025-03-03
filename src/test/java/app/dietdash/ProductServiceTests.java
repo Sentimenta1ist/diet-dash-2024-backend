@@ -4,6 +4,7 @@ import app.dietdash.dto.UserDto;
 import app.dietdash.model.Product;
 import app.dietdash.model.User;
 import app.dietdash.repository.ProductRepository;
+import app.dietdash.response.ProductResponse;
 import app.dietdash.service.ProductService;
 import app.dietdash.service.UtilService;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,11 +64,10 @@ class ProductServiceTests {
 
         when(productRepository.findByUserIdIsNullOrUserId(user.getId(), pageable)).thenReturn(productPage);
 
-        Page<Product> result = productService.getProductsPage(term, lang, user, pageable);
+        Page<ProductResponse> result = productService.getProductsPage(term, lang, user, pageable);
 
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().getFirst().getName()).isEqualTo("Apple");
-        assertThat(result.getContent().getFirst().getUser()).isEqualTo(usr);
         verify(productRepository, times(1)).findByUserIdIsNullOrUserId(user.getId(), pageable);
     }
 
@@ -91,7 +91,7 @@ class ProductServiceTests {
 
         when(productRepository.findByUserIdIsNullOrUserId(user.getId(), pageable)).thenReturn(productPage);
 
-        Page<Product> result = productService.getProductsPage(term, lang, user, pageable);
+        Page<ProductResponse> result = productService.getProductsPage(term, lang, user, pageable);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent().get(0).getName()).isEqualTo("Apple");
@@ -114,7 +114,7 @@ class ProductServiceTests {
 
         when(productRepository.findByEngNameContainingIgnoreCaseAndUserIdIsNull(term, pageable)).thenReturn(productPage);
 
-        Page<Product> result = productService.getProductBasePage(lang, term, pageable);
+        Page<ProductResponse> result = productService.getProductBasePage(lang, term, pageable);
 
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().getFirst().getName()).isEqualTo("Apple");
@@ -135,11 +135,10 @@ class ProductServiceTests {
 
         when(productRepository.findByNameContainingIgnoreCaseAndUserId(term, user.getId(), pageable)).thenReturn(productPage);
 
-        Page<Product> result = productService.getProductCreatedPage(term, user, pageable);
+        Page<ProductResponse> result = productService.getProductCreatedPage(term, user, pageable);
 
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getName()).isEqualTo("Apple");
-        assertThat(result.getContent().get(0).getUser()).isEqualTo(usr);
         verify(productRepository, times(1)).findByNameContainingIgnoreCaseAndUserId(term, user.getId(), pageable);
     }
 
@@ -161,7 +160,7 @@ class ProductServiceTests {
 
         when(productRepository.findByUserIdIsNull(pageable)).thenReturn(productPage);
 
-        Page<Product> result = productService.getProductBasePage(lang, term, pageable);
+        Page<ProductResponse> result = productService.getProductBasePage(lang, term, pageable);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent().get(0).getName()).isEqualTo("Apple");
@@ -187,7 +186,7 @@ class ProductServiceTests {
 
         when(productRepository.findByUserId(user.getId(), pageable)).thenReturn(productPage);
 
-        Page<Product> result = productService.getProductCreatedPage(term, user, pageable);
+        Page<ProductResponse> result = productService.getProductCreatedPage(term, user, pageable);
 
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent().get(0).getName()).isEqualTo("Apple");

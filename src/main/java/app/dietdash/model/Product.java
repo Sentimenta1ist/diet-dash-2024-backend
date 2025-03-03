@@ -22,7 +22,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @Entity
 @Table(name = "product")
-@ToString
 public class Product {
 
     @Id
@@ -37,6 +36,5 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonSerialize(using = UserSerializer.class)
     private User user;
 }

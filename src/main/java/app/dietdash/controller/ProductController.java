@@ -2,6 +2,7 @@ package app.dietdash.controller;
 
 import app.dietdash.dto.UserDto;
 import app.dietdash.model.Product;
+import app.dietdash.response.ProductResponse;
 import app.dietdash.service.ProductService;
 import app.dietdash.service.UtilService;
 import lombok.RequiredArgsConstructor;
@@ -25,27 +26,27 @@ public class ProductController {
     private final UtilService utilService;
 
     @GetMapping
-    public ResponseEntity<Page<Product>> getAllProducts(@RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "20") int size,
-                                                        @RequestParam(defaultValue = "en") String lang,
-                                                        @RequestParam(required = false) String term,
-                                                        @AuthenticationPrincipal UserDto principal) {
+    public ResponseEntity<Page<ProductResponse>> getAllProducts(@RequestParam(defaultValue = "0") int page,
+                                                                @RequestParam(defaultValue = "20") int size,
+                                                                @RequestParam(defaultValue = "en") String lang,
+                                                                @RequestParam(required = false) String term,
+                                                                @AuthenticationPrincipal UserDto principal) {
         return ResponseEntity.ok(productService.getProductsPage(term, lang, principal, PageRequest.of(page, size)));
     }
 
     @GetMapping("/created")
-    public ResponseEntity<Page<Product>> getProductsOfUser(@RequestParam(defaultValue = "0") int page,
-                                                           @RequestParam(defaultValue = "20") int size,
-                                                           @RequestParam(required = false) String term,
-                                                           @AuthenticationPrincipal UserDto principal) {
+    public ResponseEntity<Page<ProductResponse>> getProductsOfUser(@RequestParam(defaultValue = "0") int page,
+                                                                   @RequestParam(defaultValue = "20") int size,
+                                                                   @RequestParam(required = false) String term,
+                                                                   @AuthenticationPrincipal UserDto principal) {
         return ResponseEntity.ok(productService.getProductCreatedPage(term, principal, PageRequest.of(page, size)));
     }
 
     @GetMapping("/base")
-    public ResponseEntity<Page<Product>> getBaseProducts(@RequestParam(defaultValue = "0") int page,
-                                                         @RequestParam(defaultValue = "20") int size,
-                                                         @RequestParam(defaultValue = "en") String lang,
-                                                         @RequestParam(required = false) String term) {
+    public ResponseEntity<Page<ProductResponse>> getBaseProducts(@RequestParam(defaultValue = "0") int page,
+                                                                 @RequestParam(defaultValue = "20") int size,
+                                                                 @RequestParam(defaultValue = "en") String lang,
+                                                                 @RequestParam(required = false) String term) {
         return ResponseEntity.ok(productService.getProductBasePage(lang, term, PageRequest.of(page, size)));
     }
 

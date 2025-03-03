@@ -4,6 +4,7 @@ import app.dietdash.dto.UserDto;
 import app.dietdash.model.Product;
 import app.dietdash.model.User;
 import app.dietdash.repository.ProductRepository;
+import app.dietdash.response.ProductResponse;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -27,37 +28,53 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final UtilService utilService;
 
-    public Page<Product> getProductsPage(final String term, final String lang, final UserDto user, final Pageable pageable) {
+    private Page<ProductResponse> mapToProductResponsePage(Page<Product> productPage, String lang) {
+        return productPage.map(product -> ProductResponse.fromProductWithLang(product, lang));
+    }
+
+    public Page<ProductResponse> getProductsPage(final String term, final String lang, final UserDto user, final Pageable pageable) {
         Objects.requireNonNull(user, "User cannot be null");
         Objects.requireNonNull(pageable, "Pageable cannot be null");
 
-        if (term == null || term.trim().isEmpty()) {
-            return productRepository.findByUserIdIsNullOrUserId(user.getId(), pageable);
-        }
+        Page<Product> result;
 
-        return "en".equalsIgnoreCase(lang) ?
-                productRepository.findByUserIdIsNullOrUserId(user.getId(), pageable) :
-                productRepository.findByNameContainingIgnoreCaseAndUserIdIsNullOrUserId(term, user.getId(), pageable);
-    }
-
-    public Page<Product> getProductBasePage(final String lang, final String term, final Pageable pageable) {
-        Objects.requireNonNull(pageable, "Pageable cannot be null");
         if (term == null || term.trim().isEmpty()) {
-            return productRepository.findByUserIdIsNull(pageable);
-        }
-        return "en".equalsIgnoreCase(lang) ?
-                productRepository.findByEngNameContainingIgnoreCaseAndUserIdIsNull(term, pageable) :
-                productRepository.findByNameContainingIgnoreCaseAndUserIdIsNull(term, pageable);
-    }
-
-    public Page<Product> getProductCreatedPage(final String term, final UserDto user, final Pageable pageable) {
-        Objects.requireNonNull(user, "User cannot be null");
-        Objects.requireNonNull(pageable, "Pageable cannot be null");
-        if (term == null || term.trim().isEmpty()) {
-            return productRepository.findByUserId(user.getId(), pageable);
+            result = productRepository.findByUserIdIsNullOrUserId(user.getId(), pageable);
         } else {
-            return productRepository.findByNameContainingIgnoreCaseAndUserId(term, user.getId(), pageable);
+            result = "en".equalsIgnoreCase(lang) ? // :_)
+                    productRepository.findByUserIdAndEngName(user.getId(), term, pageable) :
+                    productRepository.findByUserIdAndName(user.getId(), term, pageable);
         }
+
+        return mapToProductResponsePage(result, lang);
+    }
+
+    public Page<ProductResponse> getProductBasePage(final String lang, final String term, final Pageable pageable) {
+        Objects.requireNonNull(pageable, "Pageable cannot be null");
+
+        Page<Product> result;
+        if (term == null || term.trim().isEmpty()) {
+            result = productRepository.findByUserIdIsNull(pageable);
+        } else {
+            result = "en".equalsIgnoreCase(lang) ?
+                    productRepository.findByEngNameContainingIgnoreCaseAndUserIdIsNull(term, pageable) :
+                    productRepository.findByNameContainingIgnoreCaseAndUserIdIsNull(term, pageable);
+        }
+
+        return mapToProductResponsePage(result, lang);
+    }
+
+    public Page<ProductResponse> getProductCreatedPage(final String term, final UserDto user, final Pageable pageable) {
+        Objects.requireNonNull(user, "User cannot be null");
+        Objects.requireNonNull(pageable, "Pageable cannot be null");
+
+        Page<Product> result;
+        if (term == null || term.trim().isEmpty()) {
+            result = productRepository.findByUserId(user.getId(), pageable);
+        } else {
+            result = productRepository.findByNameContainingIgnoreCaseAndUserId(term, user.getId(), pageable);
+        }
+        return mapToProductResponsePage(result, "en");
     }
 
     @Async

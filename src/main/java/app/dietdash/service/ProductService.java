@@ -41,7 +41,7 @@ public class ProductService {
         if (term == null || term.trim().isEmpty()) {
             result = productRepository.findByUserIdIsNullOrUserId(user.getId(), pageable);
         } else {
-            result = "en".equalsIgnoreCase(lang) ? // :_)
+            result = "en".equalsIgnoreCase(lang) ?
                     productRepository.findByUserIdAndEngName(user.getId(), term, pageable) :
                     productRepository.findByUserIdAndName(user.getId(), term, pageable);
         }

@@ -62,13 +62,13 @@ class ProductServiceTests {
         List<Product> products = List.of(product);
         Page<Product> productPage = new PageImpl<>(products);
 
-        when(productRepository.findByUserIdIsNullOrUserId(user.getId(), pageable)).thenReturn(productPage);
+        when(productRepository.findByUserIdAndEngName(user.getId(), term, pageable)).thenReturn(productPage);
 
         Page<ProductResponse> result = productService.getProductsPage(term, lang, user, pageable);
 
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().getFirst().getName()).isEqualTo("Apple");
-        verify(productRepository, times(1)).findByUserIdIsNullOrUserId(user.getId(), pageable);
+        verify(productRepository, times(1)).findByUserIdAndEngName(user.getId(), term, pageable);
     }
 
     @Test
@@ -106,7 +106,7 @@ class ProductServiceTests {
 
         Product product = new Product();
         product.setId(1L);
-        product.setName("Apple");
+        product.setEngName("Apple");
         product.setEngName("Apple");
 
         List<Product> products = List.of(product);
@@ -126,7 +126,7 @@ class ProductServiceTests {
         String term = "apple";
         Product product = new Product();
         product.setId(1L);
-        product.setName("Apple");
+        product.setEngName("Apple");
         User usr = convertToUser(user);
         product.setUser(usr);
 
@@ -138,7 +138,7 @@ class ProductServiceTests {
         Page<ProductResponse> result = productService.getProductCreatedPage(term, user, pageable);
 
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0).getName()).isEqualTo("Apple");
+        assertThat(result.getContent().getFirst().getName()).isEqualTo("Apple");
         verify(productRepository, times(1)).findByNameContainingIgnoreCaseAndUserId(term, user.getId(), pageable);
     }
 
@@ -173,12 +173,12 @@ class ProductServiceTests {
         String term = "";
         Product product1 = new Product();
         product1.setId(1L);
-        product1.setName("Apple");
+        product1.setEngName("Apple");
         product1.setUser(convertToUser(user));
 
         Product product2 = new Product();
         product2.setId(2L);
-        product2.setName("Banana");
+        product2.setEngName("Banana");
         product2.setUser(convertToUser(user));
 
         List<Product> products = List.of(product1, product2);

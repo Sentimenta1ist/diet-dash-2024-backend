@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests((requests) -> requests
                                 .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/api/auth/test", "/v3/api-docs/**", "/v3/api-docs.yaml", "/swagger-ui.html", "/webjars/swagger-ui/**", "api/ration/public").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/swagger-ui/**", "/api/v3/api-docs/**", "/v3/api-docs.yaml", "/api/swagger-ui.html", "/api/webjars/swagger-ui/**", "/api/ration/public").permitAll()
                                 .anyRequest().authenticated()
                         // .anyRequest().permitAll()
                 );

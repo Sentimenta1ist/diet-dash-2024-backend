@@ -44,6 +44,14 @@ spring:
 server:
   port: ${port}
 
+springdoc:
+  swagger-ui:
+    path: /api/swagger-ui.html
+  api-docs:
+    path: /api/v3/api-docs
+  webjars:
+    prefix: /api/webjars
+
 logging:
   level:
     org.springframework.security: DEBUG

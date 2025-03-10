@@ -1,6 +1,7 @@
 package app.dietdash.controller;
 
 import app.dietdash.config.UserAuthenticationProvider;
+import app.dietdash.dto.ContactRequest;
 import app.dietdash.dto.CredentialsDto;
 import app.dietdash.dto.SignUpDto;
 import app.dietdash.dto.UserDto;
@@ -29,6 +30,12 @@ public class AuthController {
     @GetMapping("/test")
     public String test() {
         return "test";
+    }
+
+    @PostMapping("/submit")
+    public ResponseEntity<String> submitContactForm(@RequestBody ContactRequest request) {
+        userService.sendContactEmail(request);
+        return ResponseEntity.ok("Message sent successfully.");
     }
 
     @PostMapping("/login")

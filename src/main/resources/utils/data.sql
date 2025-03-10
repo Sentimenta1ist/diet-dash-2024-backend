@@ -42,12 +42,12 @@ VALUES
 -- 5. Вставка данных в таблицу "meal"
 INSERT INTO meal (id, time, grams, product_id, ration_id)
 VALUES
-    ('08:00:00', 100, 1, 1),   -- John eats an apple in the morning
-    ('12:00:00', 150, 2, 1),   -- John eats a banana for lunch
-    (3, '18:00:00', 200, 3, 1),   -- John eats carrots for dinner
-    (4, '08:30:00', 100, 4, 2),   -- Jane eats broccoli in the morning
-    (5, '13:00:00', 120, 5, 2),   -- Jane eats eggplant for lunch
-    (6, '19:00:00', 150, 6, 2),   -- Jane eats tomatoes for dinner
+--     ('08:00:00', 100, 1, 1),   -- John eats an apple in the morning
+--     ('12:00:00', 150, 2, 1),   -- John eats a banana for lunch
+--     (3, '18:00:00', 200, 3, 1),   -- John eats carrots for dinner
+--     (4, '08:30:00', 100, 4, 2),   -- Jane eats broccoli in the morning
+--     (5, '13:00:00', 120, 5, 2),   -- Jane eats eggplant for lunch
+--     (6, '19:00:00', 150, 6, 2),   -- Jane eats tomatoes for dinner
     (7, '08:00:00', 150, 7, 3),   -- Mike eats cucumbers in the morning
     (8, '12:00:00', 200, 2, 3),   -- Mike eats a banana for lunch
     (9, '18:30:00', 250, 4, 4),   -- Sarah eats broccoli for dinner

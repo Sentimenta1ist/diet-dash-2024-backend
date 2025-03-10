@@ -36,5 +36,6 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonSerialize(using = UserSerializer.class)
     private User user;
 }

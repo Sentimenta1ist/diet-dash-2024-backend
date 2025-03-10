@@ -1,5 +1,6 @@
 package app.dietdash.service;
 
+import app.dietdash.dto.ContactRequest;
 import app.dietdash.dto.CredentialsDto;
 import app.dietdash.dto.SignUpDto;
 import app.dietdash.dto.UserDto;
@@ -11,6 +12,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -136,5 +138,18 @@ public class UserService {
                 + "</div>"
                 + "</body>"
                 + "</html>";
+    }
+
+    public void sendContactEmail(ContactRequest contact) {
+        final MimeMessage mimeMessage = emailService.createMimeMessage();
+        try {
+            final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+            helper.setTo("ivanenko.dev@gmail.com");
+            helper.setSubject("DIET-DASH: New Contact Form Submission from " + contact.getName());
+            helper.setText("Name: " + contact.getName() + "\nEmail: " + contact.getEmail() + "\nNumber: " + contact.getNumber());
+        } catch (MessagingException ex) {
+            throw new AppException("Cannot send email", HttpStatus.BAD_REQUEST);
+        }
+        emailService.send(mimeMessage);
     }
 }

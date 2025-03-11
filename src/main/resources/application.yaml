@@ -4,8 +4,8 @@ spring:
 
   datasource:
     url: ${postgres-uri}
-    username: user
-    password: password
+    username: ${user}
+    password: ${password}
 
   jpa:
     show-sql: false

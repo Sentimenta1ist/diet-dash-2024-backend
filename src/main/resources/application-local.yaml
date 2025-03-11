@@ -1,4 +1,4 @@
 postgres-uri: "jdbc:postgresql://postgres:5432/diet-dash-db"
 port: 5000
 postgres-user: diet-dash-dev
-postgres-password: ***REMOVED***
+postgres-password: =***REMOVED***

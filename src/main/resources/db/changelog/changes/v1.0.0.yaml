@@ -260,3 +260,18 @@ databaseChangeLog:
                   type: varchar(255)
                   constraints:
                     nullable: true
+  - changeSet:
+      id: "20250310-1"
+      author: diet-dash-dev
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: meal
+            constraintName: fk_meal_ration
+        - addForeignKeyConstraint:
+            baseTableName: meal
+            baseColumnNames: ration_id
+            constraintName: fk_meal_ration
+            referencedTableName: ration
+            referencedColumnNames: id
+            onDelete: CASCADE
+            onUpdate: RESTRICT

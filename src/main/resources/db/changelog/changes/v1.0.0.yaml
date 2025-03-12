@@ -275,3 +275,10 @@ databaseChangeLog:
             referencedColumnNames: id
             onDelete: CASCADE
             onUpdate: RESTRICT
+  - changeSet:
+      id: "reset_sequence_20250311"
+      author: diet-dash-dev
+      changes:
+        - sql:
+            sql: |
+              SELECT setval('meal_id_seq', (SELECT MAX(id) FROM meal) + 1);

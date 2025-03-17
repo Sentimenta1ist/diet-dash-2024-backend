@@ -1,5 +1,6 @@
 package app.dietdash.dto;
 
+import app.dietdash.model.Product;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,4 +21,5 @@ public class MealWithNameDto {
     LocalTime time;
     int grams;
     String productName;
+    Product product;
 }

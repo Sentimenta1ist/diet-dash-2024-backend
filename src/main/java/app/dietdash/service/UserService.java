@@ -12,7 +12,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -62,6 +61,7 @@ public class UserService {
         final User savedUser = userRepository.save(user);
 
         sendEmail(user, "confirm", "VERIFY EMAIL");
+        System.out.println("Send email");
 
         return userMapper.toUserDto(savedUser);
     }
@@ -116,6 +116,7 @@ public class UserService {
             throw new AppException("Cannot send email", HttpStatus.BAD_REQUEST);
         }
         emailService.send(mimeMessage);
+        System.out.println("EMAIL SENT");
     }
 
     private User findUser(final String login) {

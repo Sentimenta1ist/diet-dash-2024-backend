@@ -51,7 +51,7 @@ public class ExportService {
 
     private final RationService rationService;
 
-    public byte[] exportDoc(final LocalDate start, final LocalDate end, final UUID profileId) {
+    public byte[] exportDoc(final String lang, final LocalDate start, final LocalDate end, final UUID profileId) {
         if (start.isAfter(end)) {
             throw new AppException("startDate should be before or equal endDate", HttpStatus.BAD_REQUEST);
         }
@@ -70,27 +70,35 @@ public class ExportService {
 
             // Add header row
             XWPFTableRow headerRow = table.getRow(0); // The first row is created by default
-            formatHeaderCell(headerRow.getCell(0), "Час", "afcefa", "000000"); // Time
-            formatHeaderCell(headerRow.addNewTableCell(), "    Назва продукту", "ffd194", "000000"); // Product Name
-            formatHeaderCell(headerRow.addNewTableCell(), "Порція(г)", "b2f7c5", "000000"); // Portion (g)
+
+            final String timeHeader = "uk".equals(lang) ? "Час" : "Time";
+            final String nameHeader = "uk".equals(lang) ? "    Назва продукту" : "    Product name";
+            final String sizeHeader = "uk".equals(lang) ? "Порція(г)" : "Portion(g)";
+
+            formatHeaderCell(headerRow.getCell(0), timeHeader, "afcefa", "000000"); // Time
+            formatHeaderCell(headerRow.addNewTableCell(), nameHeader, "ffd194", "000000"); // Product Name
+            formatHeaderCell(headerRow.addNewTableCell(), sizeHeader, "b2f7c5", "000000"); // Portion (g)
             setRowMinHeight(headerRow, 400);
             setColumnWidth(headerRow.getCell(0), 1000);
             setColumnWidth(headerRow.getCell(1), 7500);
             setColumnWidth(headerRow.getCell(2), 1500);
 
             while (!date.isAfter(end)) {
-                Ration ration = rationService.getRationByProfileAndDate(profileId, date);
-                if (ration != null) {
-                    String dayWithDate = uaTransform(ration.getDate().getDayOfWeek()) + " (" + ration.getDate().format(DateTimeFormatter.ofPattern("dd/MM")) + ")";
+                List<RationDto> rations = getRationsForCurrentProfile(lang, date, date, profileId);
+                if (!rations.isEmpty() && rations.getFirst() != null) {
+                    RationDto ration = rations.getFirst();
+                    DayOfWeek dayOfWeek = ration.getDate().getDayOfWeek();
+                    String weekday = "uk".equals(lang) ? uaTransform(dayOfWeek) : enTransform(dayOfWeek);
+                    String dayWithDate = weekday + " (" + ration.getDate().format(DateTimeFormatter.ofPattern("dd/MM")) + ")";
                     addMergedCells(table, dayWithDate, "c2c2c2", 400); // Date
 
-                    List<Meal> sortedMeals = ration.getMeals().stream()
-                            .sorted(Comparator.comparing(Meal::getTime))
+                    List<MealWithNameDto> sortedMeals = ration.getMeals().stream()
+                            .sorted(Comparator.comparing(MealWithNameDto::getTime))
                             .toList();
 
-                    List<Meal> meals = ration.getMeals();
+                    List<MealWithNameDto> meals = ration.getMeals();
                     for (int i = 0; i < meals.size(); i++) {
-                        Meal meal = sortedMeals.get(i);
+                        MealWithNameDto meal = sortedMeals.get(i);
                         if (i > 0 && !sortedMeals.get(i - 1).getTime().equals(meal.getTime())) {
                             addMergedCells(table, "", null, 200); // Space
                         }
@@ -137,14 +145,14 @@ public class ExportService {
         cell.setColor(bgColor); // Set background color
     }
 
-    private static void addTableRow(XWPFTable table, Meal meal) {
+    private static void addTableRow(XWPFTable table, MealWithNameDto meal) {
         XWPFTableRow row = table.createRow();
 
         setRowMinHeight(row, 400);
 
         // Disable automatic row height adjustment to enforce the specified height
         setTableCellText(row.getCell(0), meal.getTime().toString(), ParagraphAlignment.CENTER);
-        setTableCellText(row.getCell(1), " " + meal.getProduct().getName(), ParagraphAlignment.LEFT);
+        setTableCellText(row.getCell(1), " " + meal.getProductName(), ParagraphAlignment.LEFT);
         setTableCellText(row.getCell(2), "" + meal.getGrams(), ParagraphAlignment.CENTER);
 
     }
@@ -325,18 +333,39 @@ public class ExportService {
         };
     }
 
-    public List<RationDto> getRationsForCurrentProfile(final LocalDate start, final LocalDate end, final UUID profileId) {
+    private String enTransform(DayOfWeek dayOfWeek) {
+        return switch (dayOfWeek) {
+            case MONDAY -> "Mon";
+            case TUESDAY -> "Tue";
+            case WEDNESDAY -> "Wed";
+            case THURSDAY -> "Thu";
+            case FRIDAY -> "Fri";
+            case SATURDAY -> "Sat";
+            case SUNDAY -> "Sun";
+        };
+    }
+
+    public List<RationDto> getRationsForCurrentProfile(final String lang, final LocalDate start, final LocalDate end, final UUID profileId) {
         if (start.isAfter(end)) {
             throw new AppException("startDate should be before or equal to endDate", HttpStatus.BAD_REQUEST);
         }
 
         return start.datesUntil(end.plusDays(1)) // Generate a stream of dates from start to end (inclusive)
-                .map(date -> buildRationDtoForDate(profileId, date))
+                .map(date -> buildRationDtoForDate(profileId, date, lang))
                 .filter(Objects::nonNull) // Filter out nulls if no rations exist for that date
                 .toList();
     }
 
-    private RationDto buildRationDtoForDate(UUID profileId, LocalDate date) {
+    public RationDto getRationForCurrentProfile(final String lang, final LocalDate date, final UUID profileID) {
+        List<RationDto> rations = getRationsForCurrentProfile(lang, date, date, profileID);
+        if (rations.isEmpty() || rations.getFirst() == null) {
+            return null;
+        } else {
+            return rations.getFirst();
+        }
+    }
+
+    private RationDto buildRationDtoForDate(UUID profileId, LocalDate date, String lang) {
         Ration ration = rationService.getRationByProfileAndDate(profileId, date);
         if (ration == null || ration.getMeals().isEmpty()) {
             return null;
@@ -344,13 +373,17 @@ public class ExportService {
 
         List<MealWithNameDto> sortedMealDtos = ration.getMeals().stream()
                 .sorted(Comparator.comparing(Meal::getTime))
-                .map(this::convertToMealWithNameDto)
+                .map((Meal meal) -> convertToMealWithNameDto(meal, lang))
                 .toList();
 
         return sortedMealDtos.isEmpty() ? null : new RationDto(date, sortedMealDtos);
     }
 
-    private MealWithNameDto convertToMealWithNameDto(Meal meal) {
-        return new MealWithNameDto(meal.getTime(), meal.getGrams(), meal.getProduct().getName());
+    private MealWithNameDto convertToMealWithNameDto(Meal meal, String lang) {
+        if ("uk".equals(lang)) {
+            return new MealWithNameDto(meal.getTime(), meal.getGrams(), meal.getProduct().getName(), meal.getProduct());
+        } else {
+            return new MealWithNameDto(meal.getTime(), meal.getGrams(), meal.getProduct().getEngName(), meal.getProduct());
+        }
     }
 }

@@ -3,7 +3,6 @@ package app.dietdash.controller;
 import app.dietdash.dto.LocalDatesDto;
 import app.dietdash.dto.MealDto;
 import app.dietdash.dto.RationDto;
-import app.dietdash.model.Ration;
 import app.dietdash.service.ExportService;
 import app.dietdash.service.RationService;
 import lombok.AllArgsConstructor;
@@ -34,10 +33,11 @@ public class RationController {
     private final ExportService exportService;
 
     @GetMapping("/{profileId}")
-    public ResponseEntity<Ration> getRation(
+    public ResponseEntity<RationDto> getRation(
             @PathVariable UUID profileId,
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(rationService.getRationByProfileAndDate(profileId, date));
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(defaultValue = "uk") String lang) {
+        return ResponseEntity.ok(exportService.getRationForCurrentProfile(lang, date, profileId));
     }
 
     @PostMapping("/add/{profileId}")
@@ -95,6 +95,7 @@ public class RationController {
 
     @GetMapping("/export")
     public ResponseEntity<byte[]> exportRationDoc(
+            @RequestParam(defaultValue = "uk") String lang,
             @RequestParam("profileId") UUID profileId,
             @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
@@ -102,14 +103,16 @@ public class RationController {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Rations.docx");
         headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-        return new ResponseEntity<>(exportService.exportDoc(start, end, profileId), headers, HttpStatus.OK);
+        return new ResponseEntity<>(exportService.exportDoc(lang, start, end, profileId), headers, HttpStatus.OK);
     }
 
     @GetMapping("/public")
-    public ResponseEntity<List<RationDto>> publicRation(@RequestParam("profileId") UUID profileId,
-                                                        @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
-                                                        @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
-        return new ResponseEntity<>(exportService.getRationsForCurrentProfile(start, end, profileId), HttpStatus.OK);
+    public ResponseEntity<List<RationDto>> publicRation(
+            @RequestParam(defaultValue = "uk") String lang,
+            @RequestParam("profileId") UUID profileId,
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+        return new ResponseEntity<>(exportService.getRationsForCurrentProfile(lang, start, end, profileId), HttpStatus.OK);
     }
 
 }

@@ -18,6 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class RationDto {
+    private Long id;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
     private List<MealWithNameDto> meals = new ArrayList<>();

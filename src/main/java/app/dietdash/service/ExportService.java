@@ -376,7 +376,7 @@ public class ExportService {
                 .map((Meal meal) -> convertToMealWithNameDto(meal, lang))
                 .toList();
 
-        return sortedMealDtos.isEmpty() ? null : new RationDto(date, sortedMealDtos);
+        return sortedMealDtos.isEmpty() ? null : new RationDto(ration.getId(), date, sortedMealDtos);
     }
 
     private MealWithNameDto convertToMealWithNameDto(Meal meal, String lang) {

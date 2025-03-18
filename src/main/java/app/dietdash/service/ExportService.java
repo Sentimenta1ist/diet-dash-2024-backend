@@ -381,9 +381,9 @@ public class ExportService {
 
     private MealWithNameDto convertToMealWithNameDto(Meal meal, String lang) {
         if ("uk".equals(lang)) {
-            return new MealWithNameDto(meal.getTime(), meal.getGrams(), meal.getProduct().getName(), meal.getProduct());
+            return new MealWithNameDto(meal.getId(), meal.getTime(), meal.getGrams(), meal.getProduct().getName(), meal.getProduct());
         } else {
-            return new MealWithNameDto(meal.getTime(), meal.getGrams(), meal.getProduct().getEngName(), meal.getProduct());
+            return new MealWithNameDto(meal.getId(), meal.getTime(), meal.getGrams(), meal.getProduct().getEngName(), meal.getProduct());
         }
     }
 }

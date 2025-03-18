@@ -17,6 +17,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Data
 public class MealWithNameDto {
+    Long id;
     @JsonFormat(pattern = "HH:mm")
     LocalTime time;
     int grams;

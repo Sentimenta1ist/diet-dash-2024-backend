@@ -5,6 +5,7 @@ import app.dietdash.dto.MealDto;
 import app.dietdash.dto.RationDto;
 import app.dietdash.service.ExportService;
 import app.dietdash.service.RationService;
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
@@ -111,7 +112,7 @@ public class RationController {
             @RequestParam(defaultValue = "uk") String lang,
             @RequestParam("profileId") UUID profileId,
             @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
-            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+            @RequestParam(value = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Nullable LocalDate end) {
         return new ResponseEntity<>(exportService.getRationsForCurrentProfile(lang, start, end, profileId), HttpStatus.OK);
     }
 

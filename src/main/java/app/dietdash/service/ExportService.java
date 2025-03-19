@@ -346,6 +346,12 @@ public class ExportService {
     }
 
     public List<RationDto> getRationsForCurrentProfile(final String lang, final LocalDate start, final LocalDate end, final UUID profileId) {
+        if (start == null) {
+            throw new AppException("startDate should be defined", HttpStatus.BAD_REQUEST);
+        }
+        if (end == null) {
+            return List.of(Objects.requireNonNull(buildRationDtoForDate(profileId, start, lang)));
+        }
         if (start.isAfter(end)) {
             throw new AppException("startDate should be before or equal to endDate", HttpStatus.BAD_REQUEST);
         }

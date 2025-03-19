@@ -3,6 +3,7 @@ package app.dietdash.service;
 import app.dietdash.dto.ActivityDto;
 import app.dietdash.dto.ProfileDto;
 import app.dietdash.dto.ProfileNameDto;
+import app.dietdash.dto.SimpleProfileDto;
 import app.dietdash.dto.UserDto;
 import app.dietdash.enums.Activity;
 import app.dietdash.model.Profile;
@@ -22,6 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static app.dietdash.dto.ActivityDto.toActivityDto;
+
 @Service
 @AllArgsConstructor
 public class ProfileService {
@@ -29,8 +32,8 @@ public class ProfileService {
     private final UtilService utilService;
     private final UserMapper mapper;
 
-    public List<ActivityDto> getAllActivities() {
-        return Arrays.stream(Activity.values()).map(mapper::toActivityDto).toList();
+    public List<ActivityDto> getAllActivities(String lang) {
+        return Arrays.stream(Activity.values()).map(x -> toActivityDto(x, lang)).toList();
     }
 
     public List<ProfileNameDto> getAllProfiles(final String term, final UserDto principal) {
@@ -41,8 +44,8 @@ public class ProfileService {
                 .toList();
     }
 
-    public Page<ProfileDto> getProfileList(final String term, final UserDto principal, final Pageable pageable) {
-        List<ProfileDto> filteredProfiles = utilService.getUserFromPrincipal(principal).getProfileList()
+    public Page<SimpleProfileDto> getProfileList(final String term, final UserDto principal, final Pageable pageable) {
+        List<SimpleProfileDto> filteredProfiles = utilService.getUserFromPrincipal(principal).getProfileList()
                 .stream()
                 .filter(x -> term == null || x.getName().toLowerCase().contains(term.toLowerCase()))
                 .map(mapper::toProfileDto)
@@ -51,13 +54,20 @@ public class ProfileService {
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), filteredProfiles.size());
 
-        List<ProfileDto> pagedList = (start > filteredProfiles.size()) ? List.of() : filteredProfiles.subList(start, end);
+        List<SimpleProfileDto> pagedList = (start > filteredProfiles.size()) ? List.of() : filteredProfiles.subList(start, end);
 
         return new PageImpl<>(pagedList, pageable, filteredProfiles.size());
     }
 
     public Profile getProfileById(final UUID id) {
         return profileRepository.findById(id).orElseThrow(() -> new AppException("Unknown profile with id: " + id, HttpStatus.NOT_FOUND));
+    }
+
+    public ProfileDto getProfileDtoById(final UUID id, String lang) {
+        Profile profile = profileRepository.findById(id)
+                .orElseThrow(() -> new AppException("Unknown profile with id: " + id, HttpStatus.NOT_FOUND));
+
+        return ProfileDto.toProfileDto(profile, lang);
     }
 
     @Transactional

@@ -3,6 +3,7 @@ package app.dietdash.controller;
 import app.dietdash.dto.ActivityDto;
 import app.dietdash.dto.ProfileDto;
 import app.dietdash.dto.ProfileNameDto;
+import app.dietdash.dto.SimpleProfileDto;
 import app.dietdash.dto.UserDto;
 import app.dietdash.model.Profile;
 import app.dietdash.service.ProfileService;
@@ -39,17 +40,17 @@ public class ProfileController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<Page<ProfileDto>> getProfileList(@RequestParam(defaultValue = "0") int page,
-                                                           @RequestParam(defaultValue = "10") int size,
-                                                           @RequestParam(required = false) String term,
-                                                           @AuthenticationPrincipal UserDto principal) {
+    public ResponseEntity<Page<SimpleProfileDto>> getProfileList(@RequestParam(defaultValue = "0") int page,
+                                                                 @RequestParam(defaultValue = "10") int size,
+                                                                 @RequestParam(required = false) String term,
+                                                                 @AuthenticationPrincipal UserDto principal) {
         final Pageable pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(profileService.getProfileList(term, principal, pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Profile> getProfileById(@PathVariable UUID id) {
-        return ResponseEntity.ok(profileService.getProfileById(id));
+    public ResponseEntity<ProfileDto> getProfileById(@PathVariable UUID id, @RequestParam(defaultValue = "en") String lang) {
+        return ResponseEntity.ok(profileService.getProfileDtoById(id, lang));
     }
 
     @PostMapping
@@ -70,8 +71,8 @@ public class ProfileController {
     }
 
     @GetMapping("/activities")
-    public ResponseEntity<List<ActivityDto>> getActivities() {
-        return ResponseEntity.ok(profileService.getAllActivities());
+    public ResponseEntity<List<ActivityDto>> getActivities(@RequestParam(defaultValue = "en") String lang) {
+        return ResponseEntity.ok(profileService.getAllActivities(lang));
     }
 }
 

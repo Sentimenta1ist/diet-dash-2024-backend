@@ -17,7 +17,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.CharBuffer;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -104,6 +108,11 @@ public class UserService {
     }
 
 
+    private User findUser(final String login) {
+        return userRepository.findByLogin(login)
+                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+    }
+
     private void sendEmail(final User user, final String type, final String messageButton) {
         final MimeMessage mimeMessage = emailService.createMimeMessage();
         try {
@@ -116,12 +125,15 @@ public class UserService {
             throw new AppException("Cannot send email", HttpStatus.BAD_REQUEST);
         }
         emailService.send(mimeMessage);
-        System.out.println("EMAIL SENT");
-    }
 
-    private User findUser(final String login) {
-        return userRepository.findByLogin(login)
-                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+        try (FileWriter writer = new FileWriter("contact_submission.txt", true)) {
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            writer.write("Registration try. Timestamp: " + timestamp + "\n");
+            writer.write("------------------------------------------------------------\n");
+        } catch (IOException fileEx) {
+            throw new AppException("Failed to append", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     private String createEmailContent(final UUID confirmationToken, final String type, final String messageButton) {
@@ -152,5 +164,16 @@ public class UserService {
             throw new AppException("Cannot send email", HttpStatus.BAD_REQUEST);
         }
         emailService.send(mimeMessage);
+
+        try (FileWriter writer = new FileWriter("contact_submission.txt", true)) {
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            writer.write("Timestamp: " + timestamp + "\n");
+            writer.write("Name: " + contact.getName() + "\n");
+            writer.write("Email: " + contact.getEmail() + "\n");
+            writer.write("Number: " + contact.getNumber() + "\n");
+            writer.write("------------------------------------------------------------\n");
+        } catch (IOException fileEx) {
+            throw new AppException("Failed to save contact submission", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

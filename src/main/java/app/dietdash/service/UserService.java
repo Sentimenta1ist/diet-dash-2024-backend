@@ -126,7 +126,7 @@ public class UserService {
         }
         emailService.send(mimeMessage);
 
-        try (FileWriter writer = new FileWriter("contact_submission.txt", true)) {
+        try (FileWriter writer = new FileWriter("contact/contact_submission.txt", true)) {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             writer.write("Registration try. Timestamp: " + timestamp + "\n");
             writer.write("------------------------------------------------------------\n");
@@ -165,7 +165,7 @@ public class UserService {
         }
         emailService.send(mimeMessage);
 
-        try (FileWriter writer = new FileWriter("contact_submission.txt", true)) {
+        try (FileWriter writer = new FileWriter("contact/contact_submission.txt", true)) {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             writer.write("Timestamp: " + timestamp + "\n");
             writer.write("Name: " + contact.getName() + "\n");

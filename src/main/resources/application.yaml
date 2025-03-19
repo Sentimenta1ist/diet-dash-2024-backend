@@ -54,4 +54,5 @@ springdoc:
 
 logging:
   level:
+    root: ${log-level-app:}
     org.springframework.security: INFO

@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.CharBuffer;
@@ -126,7 +127,11 @@ public class UserService {
         }
         emailService.send(mimeMessage);
 
-        try (FileWriter writer = new FileWriter("contact/contact_submission.txt", true)) {
+        File directory = new File("/app/data/contact_submission.txt").getParentFile();
+        if (!directory.exists()) {
+            directory.mkdirs();  // Создает директории, если их нет
+        }
+        try (FileWriter writer = new FileWriter("/app/data/contact_submission.txt", true)) {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             writer.write("Registration try. Timestamp: " + timestamp + "\n");
             writer.write("------------------------------------------------------------\n");
@@ -154,6 +159,10 @@ public class UserService {
     }
 
     public void sendContactEmail(ContactRequest contact) {
+        File directory = new File("/app/data/contact_submission.txt").getParentFile();
+        if (!directory.exists()) {
+            directory.mkdirs();  // Создает директории, если их нет
+        }
         final MimeMessage mimeMessage = emailService.createMimeMessage();
         try {
             final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
@@ -165,7 +174,7 @@ public class UserService {
         }
         emailService.send(mimeMessage);
 
-        try (FileWriter writer = new FileWriter("contact/contact_submission.txt", true)) {
+        try (FileWriter writer = new FileWriter("/app/data/contact_submission.txt", true)) {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             writer.write("Timestamp: " + timestamp + "\n");
             writer.write("Name: " + contact.getName() + "\n");
@@ -173,7 +182,7 @@ public class UserService {
             writer.write("Number: " + contact.getNumber() + "\n");
             writer.write("------------------------------------------------------------\n");
         } catch (IOException fileEx) {
-            throw new AppException("Failed to save contact submission", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new AppException(fileEx.getMessage() + "Failed to save contact submission", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

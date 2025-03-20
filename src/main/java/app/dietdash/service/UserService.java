@@ -8,21 +8,14 @@ import app.dietdash.model.User;
 import app.dietdash.repository.UserRepository;
 import app.dietdash.service.mapper.UserMapper;
 import exceptions.AppException;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.CharBuffer;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,7 +25,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private final EmailService emailService;
+    private final MailTrapClient emailService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -66,7 +59,6 @@ public class UserService {
         final User savedUser = userRepository.save(user);
 
         sendEmail(user, "confirm", "VERIFY EMAIL");
-        System.out.println("Send email");
 
         return userMapper.toUserDto(savedUser);
     }
@@ -115,30 +107,15 @@ public class UserService {
     }
 
     private void sendEmail(final User user, final String type, final String messageButton) {
-        final MimeMessage mimeMessage = emailService.createMimeMessage();
         try {
-            final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-            helper.setTo(user.getLogin());
-            helper.setSubject("Diet dash (" + type + ").");
-            final String content = createEmailContent(user.getConfirmationToken(), type, messageButton);
-            helper.setText(content, true);
-        } catch (MessagingException ex) {
+            emailService.sendEmail(
+                    user.getLogin(),
+                    "Diet dash (" + type + ").",
+                    createEmailContent(user.getConfirmationToken(), type, messageButton),
+                    true);
+        } catch (IOException e) {
             throw new AppException("Cannot send email", HttpStatus.BAD_REQUEST);
         }
-        emailService.send(mimeMessage);
-
-        File directory = new File("/app/data/contact_submission.txt").getParentFile();
-        if (!directory.exists()) {
-            directory.mkdirs();  // Создает директории, если их нет
-        }
-        try (FileWriter writer = new FileWriter("/app/data/contact_submission.txt", true)) {
-            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            writer.write("Registration try. Timestamp: " + timestamp + "\n");
-            writer.write("------------------------------------------------------------\n");
-        } catch (IOException fileEx) {
-            throw new AppException("Failed to append", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
     }
 
     private String createEmailContent(final UUID confirmationToken, final String type, final String messageButton) {
@@ -159,30 +136,15 @@ public class UserService {
     }
 
     public void sendContactEmail(ContactRequest contact) {
-        File directory = new File("/app/data/contact_submission.txt").getParentFile();
-        if (!directory.exists()) {
-            directory.mkdirs();  // Создает директории, если их нет
-        }
-        final MimeMessage mimeMessage = emailService.createMimeMessage();
         try {
-            final MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-            helper.setTo("ivanenko.dev@gmail.com");
-            helper.setSubject("DIET-DASH: New Contact Form Submission from " + contact.getName());
-            helper.setText("Name: " + contact.getName() + "\nEmail: " + contact.getEmail() + "\nNumber: " + contact.getNumber());
-        } catch (MessagingException ex) {
+            emailService.sendEmail(
+                    "ivanenko.dev@gmail.com",
+                    "DIET-DASH: New Contact Form Submission From " + contact.getName(),
+                    "Name: " + contact.getName() + "\nEmail: " + contact.getEmail() + "\nNumber: " + contact.getNumber(),
+                    false);
+        } catch (IOException e) {
             throw new AppException("Cannot send email", HttpStatus.BAD_REQUEST);
         }
-        emailService.send(mimeMessage);
 
-        try (FileWriter writer = new FileWriter("/app/data/contact_submission.txt", true)) {
-            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            writer.write("Timestamp: " + timestamp + "\n");
-            writer.write("Name: " + contact.getName() + "\n");
-            writer.write("Email: " + contact.getEmail() + "\n");
-            writer.write("Number: " + contact.getNumber() + "\n");
-            writer.write("------------------------------------------------------------\n");
-        } catch (IOException fileEx) {
-            throw new AppException(fileEx.getMessage() + "Failed to save contact submission", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }

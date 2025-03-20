@@ -56,3 +56,8 @@ logging:
   level:
     root: ${log-level-app:}
     org.springframework.security: INFO
+
+mailtrap:
+  api:
+    token: ***REMOVED***
+    endpoint: "https://send.api.mailtrap.io/api/send"

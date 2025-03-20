@@ -32,6 +32,11 @@ public class AuthController {
         return "test";
     }
 
+    @GetMapping("/test2")
+    public String test2() {
+        return "test2";
+    }
+
     @PostMapping("/submit")
     public ResponseEntity<String> submitContactForm(@RequestBody ContactRequest request) {
         userService.sendContactEmail(request);

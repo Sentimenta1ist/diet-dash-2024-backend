@@ -1,5 +1,6 @@
 package app.dietdash.dto;
 
+import app.dietdash.appuser.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,4 +18,5 @@ public class UserDto {
     private String login;
     private String token;
     private boolean enabled;
+    private UserRole userRole;
 }

@@ -1,5 +1,6 @@
 package app.dietdash.service;
 
+import app.dietdash.appuser.UserRole;
 import app.dietdash.dto.ContactRequest;
 import app.dietdash.dto.CredentialsDto;
 import app.dietdash.dto.SignUpDto;
@@ -55,6 +56,7 @@ public class UserService {
         final User user = userMapper.signUpToUser(userDto);
         user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.getPassword())));
         user.setConfirmationToken(UUID.randomUUID());
+        user.setUserRole(UserRole.USER);
 
         final User savedUser = userRepository.save(user);
 

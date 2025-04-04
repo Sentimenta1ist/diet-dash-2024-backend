@@ -282,3 +282,16 @@ databaseChangeLog:
         - sql:
             sql: |
               SELECT setval('meal_id_seq', (SELECT MAX(id) FROM meal) + 1);
+  - changeSet:
+      id: "202504041110-1"
+      author: diet-dash-dev
+      changes:
+        - addColumn:
+            tableName: app_user
+            columns:
+              - column:
+                  name: user_role
+                  type: VARCHAR(100)
+                  defaultValue: 'USER'
+                  constraints:
+                    nullable: false

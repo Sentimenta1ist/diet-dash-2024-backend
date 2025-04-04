@@ -1,5 +1,6 @@
 package app.dietdash.dto;
 
+import app.dietdash.appuser.UserRole;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,4 +25,5 @@ public class SignUpDto {
     @NotEmpty
     private String password;
 
+    private UserRole userRole;
 }

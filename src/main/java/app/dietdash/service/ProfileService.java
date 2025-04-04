@@ -1,5 +1,6 @@
 package app.dietdash.service;
 
+import app.dietdash.appuser.UserRole;
 import app.dietdash.dto.ActivityDto;
 import app.dietdash.dto.ProfileDto;
 import app.dietdash.dto.ProfileNameDto;
@@ -73,6 +74,10 @@ public class ProfileService {
     @Transactional
     public UUID addProfile(final Profile profile, final UserDto principal) {
         final User user = utilService.getUserFromPrincipal(principal);
+
+        if (user.getUserRole() == UserRole.USER && !user.getProfileList().isEmpty()) {
+            throw new AppException("Only PRO users can create more than 1 profile", HttpStatus.PAYMENT_REQUIRED);
+        }
 
         profile.setId(UUID.randomUUID());
         profile.setUser(user);

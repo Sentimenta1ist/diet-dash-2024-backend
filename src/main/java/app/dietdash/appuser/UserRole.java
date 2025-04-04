@@ -1,7 +1,7 @@
 package app.dietdash.appuser;
 
 
-public enum AppUserRole {
+public enum UserRole {
     USER,
-    TRAINER,
+    PRO,
 }

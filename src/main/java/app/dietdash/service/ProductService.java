@@ -1,14 +1,17 @@
 package app.dietdash.service;
 
+import app.dietdash.appuser.UserRole;
 import app.dietdash.dto.UserDto;
 import app.dietdash.model.Product;
 import app.dietdash.model.User;
 import app.dietdash.repository.ProductRepository;
 import app.dietdash.response.ProductResponse;
+import exceptions.AppException;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -140,6 +143,9 @@ public class ProductService {
     @Transactional
     public void createProduct(Product product, UserDto principal) {
         final User user = utilService.getUserFromPrincipal(principal);
+        if (user.getUserRole() != UserRole.PRO) {
+            throw new AppException("Only PRO users can add own products", HttpStatus.PAYMENT_REQUIRED);
+        }
         product.setName(product.getName());
         product.setEngName(product.getName());
         Product entity = productRepository.save(product);

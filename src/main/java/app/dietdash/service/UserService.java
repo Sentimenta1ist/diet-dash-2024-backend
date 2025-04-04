@@ -149,4 +149,16 @@ public class UserService {
         }
 
     }
+
+    public String getPlan(UserDto userDto) {
+        User user = userRepository.findByLogin(userDto.getLogin()).orElseThrow();
+
+        if (user.getUserRole().equals(UserRole.PRO)) {
+            return "Premium";
+        } else if (user.getUserRole().equals(UserRole.USER)) {
+            return "Free plan";
+        }
+
+        return "Free plan";
+    }
 }

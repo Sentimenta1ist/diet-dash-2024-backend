@@ -3,6 +3,7 @@ package app.dietdash.controller;
 import app.dietdash.dto.ActivityDto;
 import app.dietdash.dto.ProfileDto;
 import app.dietdash.dto.ProfileNameDto;
+import app.dietdash.dto.ProfileUpdateDto;
 import app.dietdash.dto.SimpleProfileDto;
 import app.dietdash.dto.UserDto;
 import app.dietdash.model.Profile;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -63,6 +65,13 @@ public class ProfileController {
         profileService.updateProfile(id, profile);
         return ResponseEntity.ok("Updated");
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<String> updateProfilePartially(@PathVariable UUID id, @RequestBody ProfileUpdateDto profile) {
+        profileService.updateProfilePartially(id, profile);
+        return ResponseEntity.ok("Updated");
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProfile(@PathVariable UUID id) {

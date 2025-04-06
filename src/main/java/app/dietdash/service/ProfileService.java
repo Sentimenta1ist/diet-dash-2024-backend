@@ -4,6 +4,7 @@ import app.dietdash.appuser.UserRole;
 import app.dietdash.dto.ActivityDto;
 import app.dietdash.dto.ProfileDto;
 import app.dietdash.dto.ProfileNameDto;
+import app.dietdash.dto.ProfileUpdateDto;
 import app.dietdash.dto.SimpleProfileDto;
 import app.dietdash.dto.UserDto;
 import app.dietdash.enums.Activity;
@@ -102,5 +103,32 @@ public class ProfileService {
                 .orElseThrow(() -> new AppException("Unknown profile with id: " + id, HttpStatus.NOT_FOUND));
 
         profileRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void updateProfilePartially(UUID id, ProfileUpdateDto dto) {
+        Profile profile = profileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
+
+        if (dto.getName() != null) profile.setName(dto.getName());
+        if (dto.getAge() != null) profile.setAge(dto.getAge());
+        if (dto.getGender() != null) profile.setGender(dto.getGender());
+        if (dto.getHeight() != null) profile.setHeight(dto.getHeight());
+        if (dto.getWeight() != null) profile.setWeight(dto.getWeight());
+        if (dto.getWaist() != null) profile.setWaist(dto.getWaist());
+        if (dto.getHips() != null) profile.setHips(dto.getHips());
+        if (dto.getGoalWeight() != null) profile.setGoalWeight(dto.getGoalWeight());
+        if (dto.getActivity() != null) profile.setActivity(dto.getActivity());
+        if (dto.getBodyMassIndex() != null) profile.setBodyMassIndex(dto.getBodyMassIndex());
+        if (dto.getDailyCalorieNorm() != null) profile.setDailyCalorieNorm(dto.getDailyCalorieNorm());
+        if (dto.getSelectedCalorieLimit() != null) profile.setSelectedCalorieLimit(dto.getSelectedCalorieLimit());
+        if (dto.getDailyProteinLimit() != null) profile.setDailyProteinLimit(dto.getDailyProteinLimit());
+        if (dto.getDailyFatLimit() != null) profile.setDailyFatLimit(dto.getDailyFatLimit());
+        if (dto.getDailyCarbsLimit() != null) profile.setDailyCarbsLimit(dto.getDailyCarbsLimit());
+        if (dto.getDailyProteinPercentage() != null) profile.setDailyProteinPercentage(dto.getDailyProteinPercentage());
+        if (dto.getDailyFatPercentage() != null) profile.setDailyFatPercentage(dto.getDailyFatPercentage());
+        if (dto.getDailyCarbsPercentage() != null) profile.setDailyCarbsPercentage(dto.getDailyCarbsPercentage());
+
+        profileRepository.save(profile);
     }
 }
